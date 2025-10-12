@@ -1,0 +1,16 @@
+# Fichiers de configuration sensibles
+*.conf
+config_local.php
+
+# Logs
+*.log
+logs/
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Fichiers temporaires
+*.tmp
+*.swp
+*~
