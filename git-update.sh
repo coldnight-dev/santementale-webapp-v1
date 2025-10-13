@@ -12,6 +12,9 @@ fi
 # Navigue dans le répertoire
 cd "$REPO_DIR" || exit 1
 
+# Récupère les changements distants
+git pull origin main
+
 # Vérifie s'il y a des changements
 if ! git status --porcelain | grep -q .; then
     echo "Aucun changement détecté. Rien à faire."
