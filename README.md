@@ -46,19 +46,22 @@ sudo mv santementale-webapp-v1 /var/www/html/santementale.org/_app/v1/
 sudo chown -R apache:apache /var/www/html/santementale.org/_app/v1/
 sudo chmod -R 755 /var/www/html/santementale.org/_app/v1/
 ```
-🔧 Configuration
+
+#### 🔧 Configuration
 Les versions autorisées sont définies dans config.php :
 define('ALLOWED_VERSIONS', ['1.0', '1.1', '1.web']);
-🔒 Sécurité et confidentialité
+
+#### 🔒 Sécurité et confidentialité
 Anonymat total : Aucun compte requis
 Données locales : Tout est stocké dans le navigateur
 Pas de tracking : Aucune donnée envoyée à un serveur externe
 Validation stricte : Système de contrôle de version à double validation
-📊 Roadmap
+
+#### 📊 Roadmap
 [ ] Système de statistiques avancées
 [ ] Système de rewards/achievements
 [ ] Export des données (JSON, CSV)
 [ ] Mode sombre
 [ ] PWA (Progressive Web App)
-🤝 Contribution
+#### 🤝 Contribution
 Ce projet est en développement actif. Les contributions sont les bienvenues !
