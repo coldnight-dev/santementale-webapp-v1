@@ -1,3 +1,6 @@
+# Script de mise à jour
+git-update.sh
+
 # Fichiers de configuration sensibles
 *.conf
 config_local.php
