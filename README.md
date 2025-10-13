@@ -26,7 +26,25 @@ Application web de santé mentale avec outils interactifs pour le bien-être per
 - **Stockage** : localStorage (navigateur)
 
 ### 📁 Structure du projet
-/v1/ ├── config.php                    # Configuration centralisée ├── version_check.php             # Validation des versions (PHP) ├── index.php                     # Page d'accueil ├── parametres.php                # Paramètres utilisateur ├── js/ │   └── version-helper.js         # Validation JS + helpers ├── outils/ │   ├── index.php                 # Liste des outils │   ├── routine-quotidienne.php │   ├── journal-des-emotions.php │   ├── journal-de-gratitude.php │   ├── pyramide-des-besoins.php │   └── balance-decisionnelle.php └── errors/ └── 403.php                   # Gestion des erreurs
+```
+/v1/
+├── config.php                    # Configuration centralisée
+├── version_check.php             # Validation des versions (PHP)
+├── index.php                     # Page d'accueil
+├── parametres.php                # Paramètres utilisateur
+├── js/
+│   └── version-helper.js         # Validation JS + helpers
+├── outils/
+│   ├── index.php                 # Liste des outils
+│   ├── routine-quotidienne.php
+│   ├── journal-des-emotions.php
+│   ├── journal-de-gratitude.php
+│   ├── pyramide-des-besoins.php
+│   └── balance-decisionnelle.php
+└── errors/
+└── 403.php                   # Gestion des erreurs
+```
+
 ## 🚀 Installation
 
 #### Prérequis
