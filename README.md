@@ -45,6 +45,7 @@ sudo mv santementale-webapp-v1 /var/www/html/santementale.org/_app/v1/
 # Configurer les permissions
 sudo chown -R apache:apache /var/www/html/santementale.org/_app/v1/
 sudo chmod -R 755 /var/www/html/santementale.org/_app/v1/
+```
 🔧 Configuration
 Les versions autorisées sont définies dans config.php :
 define('ALLOWED_VERSIONS', ['1.0', '1.1', '1.web']);
