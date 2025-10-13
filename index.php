@@ -9,10 +9,16 @@ require_once(__DIR__ . '/version_check.php');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SanteMentale.org - Appli mobile v1</title>
+    <title>SanteMentale.org - Appli bien-être</title>
     <link rel="icon" type="image/x-icon" href="https://santementale.org/favicon.ico">
     <link rel="manifest" href="/v1/manifest.json">
     <meta name="theme-color" content="#0d47a1">
+    <meta property="og:description" content="Outils interactifs et diagnostics pour le bien-être mental — Installez dès maintenant !">
+    <meta property="og:image" content="https://santementale.org/logo.png">
+    <meta property="og:url" content="https://app.santementale.org/v1/?v=1.web">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="SanteMentale.org — Web Appli">
+    <!-- fb:app_id à ajouter après création de l'app sur Facebook Developer (ex: <meta property="fb:app_id" content="123456789">) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="https://santementale.org/logo.png">
@@ -389,6 +395,52 @@ require_once(__DIR__ . '/version_check.php');
             color: var(--accent-secondary);
             text-decoration: underline;
         }
+        /* Style pour le bouton partager avec slide */
+        .share-btn {
+            position: fixed;
+            top: 60px; /* Sous la bannière (hauteur ~40px + marge) */
+            right: -200px; /* Hors écran initialement */
+            background: var(--gradient-blue);
+            color: var(--text-primary);
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 8px 16px;
+            font-size: clamp(12px, 3vw, 14px);
+            font-weight: 600;
+            cursor: pointer;
+            z-index: 999; /* Sous la bannière (z-index: 1000) */
+            box-shadow: var(--shadow-light);
+            display: flex;
+            align-items: center;
+            transition: right 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .share-btn.visible {
+            right: 10px; /* Position visible */
+            animation: slideInRight 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        .share-btn.collapsed {
+            right: -80px; /* Ne montre que l'icône + marge */
+            padding: 8px;
+            width: 40px; /* Taille compacte pour icône */
+        }
+        .share-btn:hover {
+            right: 10px !important; /* Réaffiche au hover */
+            padding: 8px 16px;
+            width: auto;
+            box-shadow: 0 10px 28px rgba(13, 71, 161, 0.5);
+        }
+        .share-btn .material-icons {
+            font-size: 18px;
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+        .share-btn.collapsed .share-text {
+            display: none; /* Cache le texte en mode collapsé */
+        }
+        @keyframes slideInRight {
+            from { right: -200px; }
+            to { right: 10px; }
+        }
         @media (orientation: landscape) {
             body {
                 transform: rotate(90deg);
@@ -401,10 +453,28 @@ require_once(__DIR__ . '/version_check.php');
                 left: 0;
                 transition: transform 0.375s cubic-bezier(0.4, 0, 0.2, 1);
             }
+            .share-btn {
+                top: 60px;
+                right: -200px;
+            }
+            .share-btn.visible {
+                right: 10px;
+            }
+            .share-btn.collapsed {
+                right: -80px;
+            }
+            .share-btn:hover {
+                right: 10px !important;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Bouton partager avec slide -->
+    <button class="share-btn" id="shareBtn">
+        <span class="material-icons">share</span>
+        <span class="share-text">Partager</span>
+    </button>
     <div id="installBanner" class="banner">
         <span id="bannerIcon" class="material-icons banner-icon">install_mobile</span>
         Installer le raccourci pour accéder aux fonctionnalités avancées
@@ -466,6 +536,58 @@ require_once(__DIR__ . '/version_check.php');
     
     <script src="/v1/js/version-helper.js"></script>
     <script>
+        // Fonction pour partager l'app
+        window.shareApp = function() {
+            const shareData = {
+                title: 'SanteMentale.org — Web Appli',
+                text: 'Découvrez l\'Appli mobile SanteMentale.org pour des outils bien-être interactifs !',
+                url: 'https://app.santementale.org/v1/?v=1.web'
+            };
+            try {
+                if (navigator.share) {
+                    navigator.share(shareData).catch(err => {
+                        console.error('Erreur de partage:', err);
+                        copyToClipboard(shareData.url);
+                    });
+                } else {
+                    copyToClipboard(shareData.url);
+                }
+            } catch (err) {
+                console.error('Erreur générale:', err);
+                alert('Erreur lors du partage. Copiez ce lien : https://app.santementale.org/v1/?v=1.web');
+            }
+        };
+
+        // Fallback pour copier dans le presse-papiers
+        window.copyToClipboard = function(text) {
+            try {
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(text).then(() => {
+                        alert('Lien copié dans le presse-papiers : https://app.santementale.org/v1/?v=1.web');
+                    }).catch(() => {
+                        alert('Erreur lors de la copie. Copiez ce lien : https://app.santementale.org/v1/?v=1.web');
+                    });
+                } else {
+                    // Fallback manuel
+                    const textarea = document.createElement('textarea');
+                    textarea.value = text;
+                    textarea.style.position = 'fixed';
+                    textarea.style.opacity = '0';
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    try {
+                        document.execCommand('copy');
+                        alert('Lien copié dans le presse-papiers : https://app.santementale.org/v1/?v=1.web');
+                    } catch (err) {
+                        alert('Erreur lors de la copie. Copiez ce lien : https://app.santementale.org/v1/?v=1.web');
+                    }
+                    document.body.removeChild(textarea);
+                }
+            } catch (err) {
+                alert('Erreur lors de la copie. Copiez ce lien : https://app.santementale.org/v1/?v=1.web');
+            }
+        };
+
         document.addEventListener('DOMContentLoaded', () => {
             const isAndroid = /Android/i.test(navigator.userAgent);
             const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -487,10 +609,8 @@ require_once(__DIR__ . '/version_check.php');
             
             if (!clientVersion) return; // Redirection en cours
             
-            // Récupérer les informations de version
-            const versionInfo = VersionHelper.getVersionInfo();
-            
             // Afficher les versions
+            const versionInfo = VersionHelper.getVersionInfo();
             document.getElementById('apiVersion').textContent = `API : ${versionInfo.api}`;
             document.getElementById('appVersion').textContent = `App : ${clientVersion}`;
             document.getElementById('appVersionFooter').textContent = `App v${clientVersion} • Mod v${versionInfo.module}`;
@@ -595,6 +715,18 @@ require_once(__DIR__ . '/version_check.php');
                 document.getElementById('welcomeMessage').innerHTML = `Bonjour, <span class="username" onclick="document.getElementById('usernamePopup').classList.add('show');">${newUsername}</span><span class="material-icons pencil-icon" style="font-size: 16px; color: var(--pencil-fill);">edit</span>`;
                 document.getElementById('usernamePopup').classList.remove('show');
             };
+            
+            // Animation du bouton partager
+            const shareBtn = document.getElementById('shareBtn');
+            setTimeout(() => {
+                shareBtn.classList.add('visible');
+                setTimeout(() => {
+                    shareBtn.classList.add('collapsed');
+                }, 7000); // Rétracter après 7 secondes
+            }, 1000); // Apparition après 1 seconde
+            
+            // Écouteur pour le clic sur le bouton partager
+            shareBtn.addEventListener('click', window.shareApp);
         });
     </script>
 </body>
