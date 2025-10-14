@@ -266,7 +266,7 @@
                 h += '<div class="bg-green-950 border border-green-900 rounded-lg p-4 text-sm text-green-200"><i class="bi bi-star mr-2"></i><strong>Astuce :</strong> Visez 3 gratitudes par jour pour maximiser les bénéfices !</div></div>';
             }
             
-            h += '</div><div style="margin-top:40px;padding-bottom:40px;text-align:center;"><a href="/v1/outils/" class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-bold rounded-lg" style="text-decoration:none;"><i class="bi bi-arrow-left"></i> Retour</a>';
+            h += '</div><div style="margin-top:40px;padding-bottom:40px;text-align:center;"><a href="/v1/outils/?v=1.0&msg=patched" class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-bold rounded-lg" style="text-decoration:none;"><i class="bi bi-arrow-left"></i> Retour</a>';
             h += '<p style="margin-top:30px;color:#555;font-size:14px;line-height:1.8;"><svg style="width:14px;height:14px;margin-right:5px;display:inline-block;vertical-align:middle;" viewBox="0 0 24 24" fill="#161616"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg><span style="color:#ddd;cursor:pointer;" onclick="openUsernamePopup()">' + state.username + '</span><br>v<span id="footerVersion"></span>.' + MODULE_REVISION + ' • Accès anticipé<br><a onclick="openPopup(\'aboutPopup\')" style="color:#0d47a1;cursor:pointer;">À propos</a> • <a onclick="openPopup(\'privacyPopup\')" style="color:#0d47a1;cursor:pointer;">Confidentialité</a><br/><span style="color:#161616;">©2025 SanteMentale.org</span></p></div></div>';
             
             app.innerHTML = h;

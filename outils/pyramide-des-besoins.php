@@ -328,7 +328,7 @@
         </div>
         <!-- Boutons Retour et Réinitialiser -->
         <div class="button-container">
-            <a href="index.php" class="back-btn"><i class="fas fa-arrow-left"></i> Retour</a>
+            <a href="/v1/outils/?v=1.0&msg=patched" class="back-btn"><i class="fas fa-arrow-left"></i> Retour</a>
             <button class="reset-btn" onclick="resetPyramid()">Réinitialiser</button>
         </div>
         <p style="margin-top: auto; color: #333;">

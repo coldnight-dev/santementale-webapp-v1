@@ -219,7 +219,7 @@
             <i class="fas fa-laptop-code"></i>
             <p>Bientôt disponible ! Notre équipe travaille d’arrache-pied pour vous concocter un nouveau module passionnant. Restez à l’écoute, de belles surprises vous attendent très prochainement. Merci de votre patience et de votre soutien ! 😊</p>
         </div>
-        <a href="index.php" class="submit-btn" style="margin-top: 20px;"><i class="fas fa-arrow-left"></i> Retour</a>
+        <a href="/v1/outils/?v=1.0&msg=patched" class="submit-btn" style="margin-top: 20px;"><i class="fas fa-arrow-left"></i> Retour</a>
         <p style="margin-top: auto; color: #333;">
             v<?php echo htmlspecialchars($_COOKIE['client_version'] ?? 'Non définie'); ?> • Accès anticipé<br>
             <a class="about-link" onclick="document.getElementById('aboutPopup').style.display = 'flex';">À propos</a> &bull; <a class="about-link" onclick="document.getElementById('privacyPopup').style.display = 'flex';">Confidentialité</a><br/>
