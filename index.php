@@ -2,7 +2,8 @@
 // Validation centralisée de la version
 require_once(__DIR__ . '/config.php');
 require_once(__DIR__ . '/version_check.php');
-// $clientVersion est maintenant disponible et validé
+// ✅ HANDLER PHP UNIQUEMENT
+require_once(__DIR__ . '/components/save-handler.php');
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -18,7 +19,6 @@ require_once(__DIR__ . '/version_check.php');
     <meta property="og:url" content="https://app.santementale.org/v1/?v=1.web">
     <meta property="og:type" content="website">
     <meta property="og:title" content="SanteMentale.org — Web Appli">
-    <!-- fb:app_id à ajouter après création de l'app sur Facebook Developer (ex: <meta property="fb:app_id" content="123456789">) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="https://santementale.org/logo.png">
@@ -26,9 +26,7 @@ require_once(__DIR__ . '/version_check.php');
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
     <?php echo getJsConfig(); ?>
-    
     <style>
         :root {
             --bg-primary: #0a0a0a;
@@ -210,7 +208,7 @@ require_once(__DIR__ . '/version_check.php');
             padding: 8px;
             line-height: 1.2;
             cursor: pointer;
-            z-index: 1000;
+            z-index: 1002;
             box-shadow: var(--shadow);
             font-weight: 600;
             font-size: clamp(14px, 3.5vw, 15px);
@@ -395,7 +393,7 @@ require_once(__DIR__ . '/version_check.php');
             color: var(--accent-secondary);
             text-decoration: underline;
         }
-        /* Style pour le bouton partager avec slide */
+        /* ✅ BOUTON PARTAGER EXACTEMENT COMME AVANT */
         .share-btn {
             position: fixed;
             top: 60px; /* Sous la bannière (hauteur ~40px + marge) */
@@ -470,11 +468,15 @@ require_once(__DIR__ . '/version_check.php');
     </style>
 </head>
 <body>
-    <!-- Bouton partager avec slide -->
+    <!-- ✅ CLOUD INTÉGRÉ (z-index 1001 = AU-DESSUS de tout) -->
+    <?php require_once(__DIR__ . '/components/save-cloud.php'); ?>
+    
+    <!-- Bouton partager EXACTEMENT COMME AVANT -->
     <button class="share-btn" id="shareBtn">
         <span class="material-icons">share</span>
         <span class="share-text">Partager</span>
     </button>
+    
     <div id="installBanner" class="banner">
         <span id="bannerIcon" class="material-icons banner-icon">install_mobile</span>
         Installer le raccourci pour accéder aux fonctionnalités avancées
@@ -533,10 +535,8 @@ require_once(__DIR__ . '/version_check.php');
         <h2>Appareil non compatible</h2>
         <p>Veuillez visiter <a href="https://app.santementale.org">https://app.santementale.org</a> avec un appareil mobile compatible Android ou iOS.</p>
     </div>
-    
     <script src="/v1/js/version-helper.js"></script>
     <script>
-        // Fonction pour partager l'app
         window.shareApp = function() {
             const shareData = {
                 title: 'SanteMentale.org — Web Appli',
@@ -557,8 +557,6 @@ require_once(__DIR__ . '/version_check.php');
                 alert('Erreur lors du partage. Copiez ce lien : https://app.santementale.org/v1/?v=1.web');
             }
         };
-
-        // Fallback pour copier dans le presse-papiers
         window.copyToClipboard = function(text) {
             try {
                 if (navigator.clipboard) {
@@ -568,7 +566,6 @@ require_once(__DIR__ . '/version_check.php');
                         alert('Erreur lors de la copie. Copiez ce lien : https://app.santementale.org/v1/?v=1.web');
                     });
                 } else {
-                    // Fallback manuel
                     const textarea = document.createElement('textarea');
                     textarea.value = text;
                     textarea.style.position = 'fixed';
@@ -587,38 +584,28 @@ require_once(__DIR__ . '/version_check.php');
                 alert('Erreur lors de la copie. Copiez ce lien : https://app.santementale.org/v1/?v=1.web');
             }
         };
-
         document.addEventListener('DOMContentLoaded', () => {
             const isAndroid = /Android/i.test(navigator.userAgent);
             const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
             const isMobile = isAndroid || isIOS;
-            
             if (!isMobile) {
                 document.getElementById('incompatible').style.display = 'flex';
                 return;
             }
-            
             const uuidKey = 'device_uuid';
             const usernameKey = 'username';
-            
-            // Initialiser et valider la version
             const clientVersion = VersionHelper.init({
                 requireVersion: true,
                 phpVersion: '<?php echo htmlspecialchars($clientVersion); ?>'
             });
-            
-            if (!clientVersion) return; // Redirection en cours
-            
-            // Afficher les versions
+            if (!clientVersion) return;
             const versionInfo = VersionHelper.getVersionInfo();
-            document.getElementById('apiVersion').textContent = `API : ${versionInfo.api}`;
-            document.getElementById('appVersion').textContent = `App : ${clientVersion}`;
+            document.getElementById('apiVersion').textContent = `API: ${versionInfo.api}`;
+            document.getElementById('appVersion').textContent = `App: ${clientVersion}`;
             document.getElementById('appVersionFooter').textContent = `App v${clientVersion} • Mod v${versionInfo.module}`;
-            
             let deviceUUID = localStorage.getItem(uuidKey);
             let username = localStorage.getItem(usernameKey);
             const isNewDevice = !deviceUUID;
-            
             if (isNewDevice) {
                 deviceUUID = crypto.randomUUID();
                 localStorage.setItem(uuidKey, deviceUUID);
@@ -628,7 +615,6 @@ require_once(__DIR__ . '/version_check.php');
                 }
                 document.getElementById('privacyPopup').classList.add('show');
             }
-            
             const welcomeMessage = document.getElementById('welcomeMessage');
             if (isNewDevice) {
                 welcomeMessage.textContent = 'Bienvenue !';
@@ -636,26 +622,20 @@ require_once(__DIR__ . '/version_check.php');
             } else {
                 welcomeMessage.innerHTML = `Bonjour, <span class="username" onclick="document.getElementById('usernamePopup').classList.add('show');">${username}</span><span class="material-icons pencil-icon" style="font-size: 16px; color: var(--pencil-fill);">edit</span>`;
             }
-            
             document.getElementById('clientUUID').textContent = `Client : ${deviceUUID}`;
-            
-            // Ajouter le paramètre v aux liens
             document.getElementById('outilsBtn').href = VersionHelper.createVersionedUrl('/v1/outils/');
             document.getElementById('settingsBtn').href = VersionHelper.createVersionedUrl('/v1/parametres.php');
-            
             let deferredPrompt = null;
             window.addEventListener('beforeinstallprompt', (e) => {
                 e.preventDefault();
                 deferredPrompt = e;
             });
-            
             const isInstalled = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
             const installBanner = document.getElementById('installBanner');
             const bannerIcon = document.getElementById('bannerIcon');
             const installPopup = document.getElementById('installPopup');
             const installArea = document.getElementById('installArea');
             const testsBtn = document.getElementById('testsBtn');
-            
             function showInstallPopup() {
                 installPopup.classList.add('show');
                 installArea.innerHTML = '';
@@ -686,8 +666,6 @@ require_once(__DIR__ . '/version_check.php');
                     installArea.appendChild(errorMsg);
                 }
             }
-            
-            // Afficher la bannière d'installation uniquement pour 1.web et si non installé
             if (!isInstalled && clientVersion === '1.web') {
                 if (isAndroid) {
                     installBanner.innerHTML = '<span class="material-icons banner-icon">android</span> Installer l\'application pour accéder aux tests diagnostics';
@@ -707,7 +685,6 @@ require_once(__DIR__ . '/version_check.php');
                 installBanner.style.display = 'none';
                 testsBtn.classList.remove('disabled');
             }
-            
             window.saveUsername = function() {
                 const input = document.getElementById('usernameInput');
                 const newUsername = input.value.trim() || 'visiteur';
@@ -715,17 +692,13 @@ require_once(__DIR__ . '/version_check.php');
                 document.getElementById('welcomeMessage').innerHTML = `Bonjour, <span class="username" onclick="document.getElementById('usernamePopup').classList.add('show');">${newUsername}</span><span class="material-icons pencil-icon" style="font-size: 16px; color: var(--pencil-fill);">edit</span>`;
                 document.getElementById('usernamePopup').classList.remove('show');
             };
-            
-            // Animation du bouton partager
             const shareBtn = document.getElementById('shareBtn');
             setTimeout(() => {
                 shareBtn.classList.add('visible');
                 setTimeout(() => {
                     shareBtn.classList.add('collapsed');
-                }, 7000); // Rétracter après 7 secondes
-            }, 1000); // Apparition après 1 seconde
-            
-            // Écouteur pour le clic sur le bouton partager
+                }, 7000);
+            }, 1000);
             shareBtn.addEventListener('click', window.shareApp);
         });
     </script>
