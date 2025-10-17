@@ -1030,14 +1030,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         });
-    } else if
-
 // ========================================
 // PARTIE 2/2 - SUITE DU SCRIPT v0.11
 // À COLLER APRÈS LA LIGNE "} else if" du premier fichier
 // ========================================
 
- (state.view === 'stats') {
+} else if (state.view === 'stats') {
         renderStatsChart();
     }
 }
