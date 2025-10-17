@@ -17,9 +17,7 @@ require_once(__DIR__ . '/../version_check.php');
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
     <?php echo getJsConfig(); ?>
-    
     <style>
         :root {
             --bg-primary: #000;
@@ -41,6 +39,8 @@ require_once(__DIR__ . '/../version_check.php');
             --username-color: #ddd;
             --footer-color: #333;
             --pencil-fill: #161616;
+            --pill-bg: linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+            --pill-border: rgba(255,255,255,0.06);
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body {
@@ -271,6 +271,38 @@ require_once(__DIR__ . '/../version_check.php');
             fill: var(--accent-primary);
             transform: rotate(180deg);
         }
+
+        /* === Styles pour l'affichage niveau / XP dans la carte Routine === */
+        .routine-stats {
+            margin-top: 12px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .routine-stats .stat-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: var(--pill-bg);
+            border: 1px solid var(--pill-border);
+            font-size: 13px;
+            color: var(--text-secondary);
+            box-shadow: var(--shadow-light);
+            backdrop-filter: blur(6px);
+        }
+        .routine-stats .stat-icon {
+            font-size: 14px;
+            color: var(--accent-primary);
+        }
+        .routine-stats .stat-pill.small {
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+        /* === fin === */
+
         .popup {
             position: fixed;
             top: 0;
@@ -440,8 +472,10 @@ require_once(__DIR__ . '/../version_check.php');
         <div class="tools-list">
             <a href="/v1/outils/routine-quotidienne.php" class="tool-item" id="routineTool">
                 <h2><i class="fas fa-calendar-alt tool-icon"></i> Routine quotidienne <span class="new-badge">Nouveau</span></h2>
-                <p>Planifiez et suivez vos activités quotidiennes pour un équilibre optimal.</p>
+                <p>Planifiez et suivez vos activités quotiennes pour un équilibre optimal.</p>
                 <div class="goal-progress" id="routineGoal"></div>
+                <!-- Conteneur ajouté pour afficher niveau & XP (icone + pilles) -->
+                <div class="routine-stats" id="routineStats" aria-hidden="false"></div>
             </a>
             <a href="/v1/outils/journal-des-emotions.php" class="tool-item" id="emotionTool">
                 <h2><i class="fas fa-face-smile tool-icon"></i> Journal des émotions</h2>
@@ -449,7 +483,8 @@ require_once(__DIR__ . '/../version_check.php');
                 <div class="goal-progress" id="emotionGoal"></div>
             </a>
             <a href="/v1/outils/journal-de-gratitude.php" class="tool-item" id="gratitudeTool">
-                <h2><i class="fas fa-book tool-icon"></i> Journal de gratitude</h2>
+                <h2><i class="fas fa-book tool-icon"></i> Journal de
+gratitude</h2>
                 <p>Enregistrez des pensées positives pour cultiver votre bien-être.</p>
                 <div class="goal-progress" id="gratitudeGoal"></div>
             </a>
@@ -468,7 +503,6 @@ require_once(__DIR__ . '/../version_check.php');
             <span style="color: #161616;">©2025 SanteMentale.org</span><br>
         </p>
     </div>
-    
     <script src="/v1/js/version-helper.js"></script>
     <script>
         function getGreeting() {
@@ -480,36 +514,28 @@ require_once(__DIR__ . '/../version_check.php');
         }
         document.addEventListener('DOMContentLoaded', () => {
             const usernameKey = 'username';
-            
             let username = localStorage.getItem(usernameKey);
             if (!username) {
                 localStorage.setItem(usernameKey, 'visiteur');
                 username = 'visiteur';
             }
-            
             const welcomeMessage = document.getElementById('welcomeMessage');
             const greeting = getGreeting();
             welcomeMessage.innerHTML = `<svg class="pencil-icon" viewBox="0 0 24 24" fill="#161616" onclick="document.getElementById('usernamePopup').classList.add('show');"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>${greeting}, <span class="username" onclick="document.getElementById('usernamePopup').classList.add('show');">${username}</span>!`;
-            
             // ===== AJOUT SYSTÈME DE VALIDATION CENTRALISÉ =====
             const clientVersion = VersionHelper.init({
                 requireVersion: true,
                 phpVersion: '<?php echo htmlspecialchars($clientVersion); ?>'
             });
-            
             if (!clientVersion) return; // Redirection en cours
-            
             // Récupérer les informations de version
             const versionInfo = VersionHelper.getVersionInfo();
             // ===== FIN AJOUT =====
-            
             // Afficher la version
             document.getElementById('footerVersion').textContent = `v${clientVersion}-m0.12`;
             document.getElementById('appVersion').textContent = `App: ${clientVersion}`;
-            
             // Définir le bouton de retour avec le paramètre v
             document.getElementById('backBtn').href = `/v1/?v=${encodeURIComponent(clientVersion)}`;
-            
             // Ajouter le paramètre ?v= à tous les liens des outils
             const versionParam = `?v=${encodeURIComponent(clientVersion)}`;
             document.getElementById('routineTool').href = `/v1/outils/routine-quotidienne.php${versionParam}`;
@@ -517,20 +543,18 @@ require_once(__DIR__ . '/../version_check.php');
             document.getElementById('gratitudeTool').href = `/v1/outils/journal-de-gratitude.php${versionParam}`;
             document.getElementById('pyramideTool').href = `/v1/outils/pyramide-des-besoins.php${versionParam}`;
             document.getElementById('balanceTool').href = `/v1/outils/balance-decisionnelle.php${versionParam}`;
-
-            
             function updateTime() {
                 const now = new Date();
                 const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
                 const dayName = days[now.getDay()];
                 const dayNum = now.getDate();
                 const hours = String(now.getHours()).padStart(2, '0');
-                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2,
+'0');
                 document.getElementById('datetime').innerHTML = `${dayName} ${dayNum}<br>${hours}<span class="colon">:</span>${minutes}`;
             }
             updateTime();
             setInterval(updateTime, 1000);
-            
             const routineStreak = parseInt(localStorage.getItem('routineStreak')) || 0;
             const routineGoalDays = parseInt(localStorage.getItem('routineGoalDays')) || 7;
             const routineProgress = Math.min((routineStreak / routineGoalDays) * 100, 100);
@@ -545,7 +569,29 @@ require_once(__DIR__ . '/../version_check.php');
                 </div>
                 <span class="progress-text">0/${routineGoalDays}</span>
             `;
-            
+
+            // === AJOUT : afficher niveau + XP dans la carte Routine ===
+            try {
+                const routineLevel = parseInt(localStorage.getItem('routineLevel')) || 0;
+                const routineXP = parseInt(localStorage.getItem('routineXP')) || 0;
+                const routineStatsEl = document.getElementById('routineStats');
+                if (routineStatsEl) {
+                    routineStatsEl.innerHTML = `
+                        <div class="stat-pill small" title="Niveau de routine">
+                            <i class="fas fa-award stat-icon" aria-hidden="true"></i>
+                            <span> Niveau ${routineLevel}</span>
+                        </div>
+                        <div class="stat-pill small" title="XP accumulée">
+                            <i class="fas fa-bolt stat-icon" aria-hidden="true"></i>
+                            <span> ${routineXP} XP</span>
+                        </div>
+                    `;
+                }
+            } catch (e) {
+                console.warn('Impossible d\'afficher niveau/XP routine:', e);
+            }
+            // === FIN AJOUT ===
+
             const emotionStreak = parseInt(localStorage.getItem('emotionStreak')) || 0;
             const emotionGoalDays = parseInt(localStorage.getItem('goalDays')) || 5;
             const emotionProgress = Math.min((emotionStreak / emotionGoalDays) * 100, 100);
@@ -560,7 +606,6 @@ require_once(__DIR__ . '/../version_check.php');
                 </div>
                 <span class="progress-text">0/${emotionGoalDays}</span>
             `;
-            
             const gratitudeStreak = parseInt(localStorage.getItem('gratitudeStreak')) || 0;
             const gratitudeGoalDays = parseInt(localStorage.getItem('gratitudeGoalDays')) || 5;
             const gratitudeProgress = Math.min((gratitudeStreak / gratitudeGoalDays) * 100, 100);
@@ -581,7 +626,8 @@ require_once(__DIR__ . '/../version_check.php');
             const newUsername = input.value.trim() || 'visiteur';
             localStorage.setItem('username', newUsername);
             const greeting = getGreeting();
-            document.getElementById('welcomeMessage').innerHTML = `<svg class="pencil-icon" viewBox="0 0 24 24" fill="#161616" onclick="document.getElementById('usernamePopup').classList.add('show');"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>${greeting}, <span class="username" onclick="document.getElementById('usernamePopup').classList.add('show');">${newUsername}</span>!`;
+            document.getElementById('welcomeMessage').innerHTML = `<svg class="pencil-icon" viewBox="0 0 24 24" fill="#161616" onclick="document.getElementById('usernamePopup').classList.add('show');"><path
+d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>${greeting}, <span class="username" onclick="document.getElementById('usernamePopup').classList.add('show');">${newUsername}</span>!`;
             document.getElementById('usernamePopup').classList.remove('show');
         };
     </script>
