@@ -135,7 +135,7 @@ function generateShareImage() {
 }
 
 function drawShareContent(ctx, canvas) {
-    const username = 'Utilisateur';
+const username = localStorage.getItem('username') || localStorage.getItem('device_uuid')?.substring(0, 8) || 'Utilisateur';
     const prideQuotes = [
         'Voyez comment ' + username + ' a progressé !',
         'Regardez les accomplissements de ' + username + ' !',
@@ -148,7 +148,7 @@ function drawShareContent(ctx, canvas) {
     ctx.fillText(quote, canvas.width / 2, 220);
 
     ctx.fillStyle = '#ffffff'; ctx.font = 'bold 80px sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText('Ma Progression Routines', canvas.width / 2, 320);
+    ctx.fillText('Routines quotidiennes', canvas.width / 2, 320);
 
     ctx.font = 'bold 120px sans-serif'; ctx.fillStyle = '#fbbf24';
     ctx.fillText('⭐ Niveau ' + state.level, canvas.width / 2, 480);
