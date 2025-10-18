@@ -66,21 +66,6 @@ function initDefaultRoutines() {
 function openPopup(id) { document.getElementById(id).style.display = 'flex'; }
 function closePopup(id) { document.getElementById(id).style.display = 'none'; }
 
-function showShareModal(url) {
-    const modal = document.getElementById('shareModal');
-    document.getElementById('shareUrl').value = url;
-    openPopup('shareModal');
-}
-
-function copyShareUrl() {
-    const input = document.getElementById('shareUrl');
-    input.select();
-    document.execCommand('copy');
-    const btn = document.querySelector('#shareModal .copy-btn');
-    btn.textContent = '✓ Copié !';
-    setTimeout(() => btn.textContent = 'Copier le lien', 2000);
-}
-
 function showWhatsNew() { closePopup('helpModalPopup'); renderWhatsNew(true); openPopup('whatsNewPopup'); }
 function startTutorial() { state.tutorialStep = 0; showTutorialStep(); }
 
@@ -150,7 +135,7 @@ function generateShareImage() {
 }
 
 function drawShareContent(ctx, canvas) {
-    const username = localStorage.getItem('user_display_name') || localStorage.getItem('device_uuid')?.substring(0, 8) || 'Utilisateur';
+    const username = 'Utilisateur';
     const prideQuotes = [
         'Voyez comment ' + username + ' a progressé !',
         'Regardez les accomplissements de ' + username + ' !',
@@ -163,7 +148,7 @@ function drawShareContent(ctx, canvas) {
     ctx.fillText(quote, canvas.width / 2, 220);
 
     ctx.fillStyle = '#ffffff'; ctx.font = 'bold 80px sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText('Routines quotidiennes', canvas.width / 2, 320);
+    ctx.fillText('Ma Progression Routines', canvas.width / 2, 320);
 
     ctx.font = 'bold 120px sans-serif'; ctx.fillStyle = '#fbbf24';
     ctx.fillText('⭐ Niveau ' + state.level, canvas.width / 2, 480);
@@ -214,7 +199,11 @@ function drawShareContent(ctx, canvas) {
             
             if (result.success) {
                 const shareUrl = 'https://app.santementale.org/share/' + result.uid;
-                showShareModal(shareUrl);
+                if (navigator.share) {
+                    navigator.share({ title: 'Ma progression Routines', url: shareUrl });
+                } else {
+                    prompt('Lien de partage:', shareUrl);
+                }
             } else {
                 alert('Erreur lors de la création du partage');
             }
