@@ -36,7 +36,9 @@ Application web de santé mentale avec outils interactifs pour le bien-être per
 │   └── version-helper.js         # Validation JS + helpers
 ├── outils/
 │   ├── index.php                 # Liste des outils
-│   ├── routine-quotidienne.php
+│   ├── routine-quotidienne/
+│   │   ├── index.php
+│   │   └── script.js
 │   ├── journal-des-emotions.php
 │   ├── journal-de-gratitude.php
 │   ├── pyramide-des-besoins.php
@@ -70,10 +72,10 @@ Les versions autorisées sont définies dans config.php :
 define('ALLOWED_VERSIONS', ['1.0', '1.1', '1.web']);
 
 ### 🔒 Sécurité et confidentialité
-Anonymat total : Aucun compte requis
-Données locales : Tout est stocké dans le navigateur
-Pas de tracking : Aucune donnée envoyée à un serveur externe
-Validation stricte : Système de contrôle de version à double validation
+• Anonymat total : Aucun compte requis
+• Données locales : Tout est stocké dans le navigateur
+• Pas de tracking : Aucune donnée privée envoyée à un serveur externe
+• Validation stricte : Système de contrôle de version à double validation
 
 ### 📊 Roadmap
 [ ] Système de statistiques avancées
