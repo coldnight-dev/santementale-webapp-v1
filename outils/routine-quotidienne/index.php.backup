@@ -415,53 +415,9 @@
     
     <!-- NOUVEAU v0.11 - Popup détails jour historique -->
     <div id="dayDetailPopup" class="popup">
-    
-    <!-- NOUVEAU v0.11 - Popup partage -->
-    <div id="shareModal" class="popup">
-        <div class="popup-content" style="text-align:center;">
-            <h3 style="font-weight:bold;margin-bottom:15px;">🎉 Partage créé !</h3>
-            <p style="margin-bottom:15px;">Partagez votre progression avec ce lien :</p>
-            <input type="text" id="shareUrl" readonly style="width:100%;padding:10px;border:1px solid #ccc;border-radius:5px;margin-bottom:15px;font-family:monospace;font-size:14px;">
-            <button class="close-btn copy-btn" onclick="copyShareUrl()" style="width:100%;background:#10B981;color:white;margin-bottom:10px;">Copier le lien</button>
-            <button class="close-btn" onclick="closePopup('shareModal')" style="width:100%;">Fermer</button>
-        </div>
-    </div>
         <div class="popup-content" style="text-align:left;">
-    
-    <!-- NOUVEAU v0.11 - Popup partage -->
-    <div id="shareModal" class="popup">
-        <div class="popup-content" style="text-align:center;">
-            <h3 style="font-weight:bold;margin-bottom:15px;">🎉 Partage créé !</h3>
-            <p style="margin-bottom:15px;">Partagez votre progression avec ce lien :</p>
-            <input type="text" id="shareUrl" readonly style="width:100%;padding:10px;border:1px solid #ccc;border-radius:5px;margin-bottom:15px;font-family:monospace;font-size:14px;">
-            <button class="close-btn copy-btn" onclick="copyShareUrl()" style="width:100%;background:#10B981;color:white;margin-bottom:10px;">Copier le lien</button>
-            <button class="close-btn" onclick="closePopup('shareModal')" style="width:100%;">Fermer</button>
-        </div>
-    </div>
             <h3 id="dayDetailTitle" style="font-weight:bold;margin-bottom:15px;text-align:center;"></h3>
-    
-    <!-- NOUVEAU v0.11 - Popup partage -->
-    <div id="shareModal" class="popup">
-        <div class="popup-content" style="text-align:center;">
-            <h3 style="font-weight:bold;margin-bottom:15px;">🎉 Partage créé !</h3>
-            <p style="margin-bottom:15px;">Partagez votre progression avec ce lien :</p>
-            <input type="text" id="shareUrl" readonly style="width:100%;padding:10px;border:1px solid #ccc;border-radius:5px;margin-bottom:15px;font-family:monospace;font-size:14px;">
-            <button class="close-btn copy-btn" onclick="copyShareUrl()" style="width:100%;background:#10B981;color:white;margin-bottom:10px;">Copier le lien</button>
-            <button class="close-btn" onclick="closePopup('shareModal')" style="width:100%;">Fermer</button>
-        </div>
-    </div>
             <div id="dayDetailContent"></div>
-    
-    <!-- NOUVEAU v0.11 - Popup partage -->
-    <div id="shareModal" class="popup">
-        <div class="popup-content" style="text-align:center;">
-            <h3 style="font-weight:bold;margin-bottom:15px;">🎉 Partage créé !</h3>
-            <p style="margin-bottom:15px;">Partagez votre progression avec ce lien :</p>
-            <input type="text" id="shareUrl" readonly style="width:100%;padding:10px;border:1px solid #ccc;border-radius:5px;margin-bottom:15px;font-family:monospace;font-size:14px;">
-            <button class="close-btn copy-btn" onclick="copyShareUrl()" style="width:100%;background:#10B981;color:white;margin-bottom:10px;">Copier le lien</button>
-            <button class="close-btn" onclick="closePopup('shareModal')" style="width:100%;">Fermer</button>
-        </div>
-    </div>
             <button class="close-btn" onclick="closePopup('dayDetailPopup')" style="width:100%;margin-top:15px;">Fermer</button>
         </div>
     </div>
