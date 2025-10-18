@@ -115,30 +115,56 @@ function renderWhatsNew(showClose) {
 }
 
 function generateShareImage() {
-    const canvas = document.createElement('canvas');
-    canvas.width = 1200; canvas.height = 1600; const ctx = canvas.getContext('2d');
+    const canvas = document.getElementById('shareCanvas');
+    const ctx = canvas.getContext('2d');
+    
     const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
     gradient.addColorStop(0, '#1e3a8a'); gradient.addColorStop(1, '#1e40af');
     ctx.fillStyle = gradient; ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+    const logoImg = new Image();
+    logoImg.crossOrigin = 'anonymous';
+    logoImg.onload = function() {
+        ctx.drawImage(logoImg, 40, 40, 120, 120);
+        drawShareContent(ctx, canvas);
+    };
+    logoImg.onerror = function() {
+        drawShareContent(ctx, canvas);
+    };
+    logoImg.src = 'https://santementale.org/favicon.ico';
+}
+
+function drawShareContent(ctx, canvas) {
+    const username = 'Utilisateur';
+    const prideQuotes = [
+        'Voyez comment ' + username + ' a progressé !',
+        'Regardez les accomplissements de ' + username + ' !',
+        username + ' construit de meilleures habitudes !',
+        'Admirez la progression de ' + username + ' !'
+    ];
+    const quote = prideQuotes[Math.floor(Math.random() * prideQuotes.length)];
+
+    ctx.fillStyle = '#ffffff'; ctx.font = '36px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(quote, canvas.width / 2, 220);
+
     ctx.fillStyle = '#ffffff'; ctx.font = 'bold 80px sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText('Ma Progression Routines', canvas.width / 2, 150);
+    ctx.fillText('Ma Progression Routines', canvas.width / 2, 320);
 
     ctx.font = 'bold 120px sans-serif'; ctx.fillStyle = '#fbbf24';
-    ctx.fillText('⭐ Niveau ' + state.level, canvas.width / 2, 320);
+    ctx.fillText('⭐ Niveau ' + state.level, canvas.width / 2, 480);
 
     const xpInLevel = state.xp % XP_PER_LEVEL;
     ctx.font = '50px sans-serif'; ctx.fillStyle = '#ffffff';
-    ctx.fillText(xpInLevel + ' / ' + XP_PER_LEVEL + ' XP', canvas.width / 2, 400);
+    ctx.fillText(xpInLevel + ' / ' + XP_PER_LEVEL + ' XP', canvas.width / 2, 560);
 
-    const barWidth = 800, barHeight = 60, barX = (canvas.width - barWidth) / 2, barY = 450;
+    const barWidth = 800, barHeight = 60, barX = (canvas.width - barWidth) / 2, barY = 610;
     ctx.fillStyle = '#18181b'; ctx.fillRect(barX, barY, barWidth, barHeight);
     const fillWidth = (xpInLevel / XP_PER_LEVEL) * barWidth;
     const fillGradient = ctx.createLinearGradient(barX, 0, barX + barWidth, 0);
     fillGradient.addColorStop(0, '#3B82F6'); fillGradient.addColorStop(1, '#60A5FA');
     ctx.fillStyle = fillGradient; ctx.fillRect(barX, barY, fillWidth, barHeight);
 
-    const statsY = 600; ctx.font = 'bold 60px sans-serif'; ctx.fillStyle = '#ffffff';
+    const statsY = 760; ctx.font = 'bold 60px sans-serif'; ctx.fillStyle = '#ffffff';
     ctx.fillText('🔥 ' + state.streak + ' jours', canvas.width / 2, statsY);
     ctx.font = '50px sans-serif'; ctx.fillText(state.totalTasksCompleted + ' tâches complétées', canvas.width / 2, statsY + 80);
     ctx.fillText('✨ ' + state.perfectDaysCount + ' journées parfaites', canvas.width / 2, statsY + 160);
@@ -156,9 +182,34 @@ function generateShareImage() {
     ctx.font = '40px sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.7)';
     ctx.fillText('SanteMentale.org', canvas.width / 2, canvas.height - 100);
 
-    canvas.toBlob(blob => {
-        const url = URL.createObjectURL(blob); const a = document.createElement('a');
-        a.href = url; a.download = 'ma-progression-routines.png'; a.click(); URL.revokeObjectURL(url);
+    canvas.toBlob(async blob => {
+        const formData = new FormData();
+        formData.append('image', blob, 'share.png');
+        formData.append('level', state.level);
+        formData.append('xp', state.xp);
+        formData.append('streak', state.streak);
+        formData.append('tasks', state.totalTasksCompleted);
+        
+        try {
+            const response = await fetch('/v1/share/upload.php', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+            
+            if (result.success) {
+                const shareUrl = 'https://app.santementale.org/share/' + result.uid;
+                if (navigator.share) {
+                    navigator.share({ title: 'Ma progression Routines', url: shareUrl });
+                } else {
+                    prompt('Lien de partage:', shareUrl);
+                }
+            } else {
+                alert('Erreur lors de la création du partage');
+            }
+        } catch(e) {
+            alert('Erreur: ' + e.message);
+        }
     });
 }
 
@@ -464,7 +515,7 @@ function render() {
     const app = document.getElementById('app'); const clientVersion = localStorage.getItem('client_version') || '1.web';
     let h = '<div class="bg-zinc-900 border-b border-zinc-800 sticky top-0 z-10"><div class="max-w-2xl mx-auto px-4 py-4 flex items-center gap-3">';
     h += '<a href="/v1/outils/?v=' + clientVersion + '" class="back-btn" style="flex-shrink:0;"><span class="material-icons">arrow_back</span></a>';
-    h += '<h1 class="text-3xl font-bold title-genos">Routines <button onclick="openPopup(\'helpModalPopup\')" style="background:none;border:none;cursor:pointer;font-size:18px;color:#3B82F6;font-weight:bold;padding:0;margin-left:4px;vertical-align:baseline;">?</button></h1>';
+    h += '<h1 class="text-3xl font-bold title-genos">Routines <button onclick="openPopup(\'helpModalPopup\')" style="background:none;border:none;cursor:pointer;color:#3B82F6;padding:0;margin-left:4px;vertical-align:baseline;"><span class="material-icons" style="font-size:20px;">info</span></button></h1>';
     h += '<div style="margin-left:auto;"><span class="material-symbols-outlined title-icon-animated" style="color:#3B82F6;font-size:32px;">routine</span></div></div></div>';
     h += '<div class="bg-zinc-900 border-b border-zinc-800"><div class="max-w-2xl mx-auto px-4"><div class="flex gap-1 justify-around">';
     h += '<button onclick="state.view=\'today\';render();" class="py-4 px-3 transition-all ' + (state.view==='today'?'text-blue-400 border-b-2 border-blue-500':'text-zinc-500') + '"><span class="material-icons" style="font-size:24px;">check_box</span></button>';
@@ -475,7 +526,7 @@ function render() {
     h += '</div></div></div><div class="max-w-2xl mx-auto px-4 py-6">';
     const xpInLevel = state.xp % XP_PER_LEVEL; const xpPercent = (xpInLevel / XP_PER_LEVEL) * 100;
     h += '<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4 mb-4">';
-    h += '<div class="flex items-center justify-between mb-2"><div class="flex items-center gap-2"><span class="material-icons text-yellow-400" style="font-size:28px;">star</span><span class="font-bold text-lg">Niveau ' + state.level + '</span></div>';
+    h += '<div class="flex items-center justify-between mb-2" style="position:relative;z-index:1;"><div class="flex items-center gap-2"><span class="material-icons text-yellow-400" style="font-size:28px;">star</span><span class="font-bold text-lg">Niveau ' + state.level + '</span></div>';
     h += '<span class="text-sm text-zinc-400">' + xpInLevel + ' / ' + XP_PER_LEVEL + ' XP</span></div><div class="xp-bar"><div class="xp-fill" style="width:' + xpPercent + '%"></div><div class="xp-text">' + Math.round(xpPercent) + '%</div></div></div>';
 
     if (state.view === 'today') {
@@ -503,7 +554,7 @@ function render() {
         calcStreak(); h += '<div class="space-y-4">';
         h += '<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4"><h3 class="font-bold mb-3"><span class="material-icons mr-2" style="vertical-align:middle;">show_chart</span>7 derniers jours</h3>';
         h += '<div class="chart-container"><canvas id="statsChart"></canvas></div></div>';
-        h += '<button onclick="generateShareImage()" class="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-lg hover:from-purple-700 hover:to-pink-700 flex items-center justify-center gap-2" style="transition:all 0.2s;"><span class="material-icons">share</span>Partager ma progression</button>';
+        h += '<button onclick="generateShareImage()" class="w-full py-3 text-white font-bold rounded-lg flex items-center justify-center gap-2" style="transition:all 0.2s;background:linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);"><span class="material-icons">share</span>Partager ma progression</button>';
         h += '<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4"><h3 class="font-bold mb-3"><span class="material-icons mr-2" style="vertical-align:middle;">trending_up</span>Résumé</h3><div class="grid grid-cols-2 gap-3">';
         h += '<div class="text-center p-3 bg-zinc-950 rounded-lg"><div class="text-4xl font-bold">' + state.history.length + 
             '</div><div class="text-xs text-zinc-500">Jours enregistrés</div></div>';
