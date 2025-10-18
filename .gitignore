@@ -17,3 +17,7 @@ Thumbs.db
 *.tmp
 *.swp
 *~
+
+# Données utilisateurs
+share/*.png
+share/*.json
