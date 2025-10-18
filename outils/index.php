@@ -470,7 +470,7 @@ require_once(__DIR__ . '/../version_check.php');
         <img src="https://santementale.org/logo.png" alt="Logo SanteMentale.org" class="logo">
         <h1 id="welcomeMessage"></h1>
         <div class="tools-list">
-            <a href="/v1/outils/routine-quotidienne.php" class="tool-item" id="routineTool">
+            <a href="/v1/outils/routine-quotidienne/index.php" class="tool-item" id="routineTool">
                 <h2><i class="fas fa-calendar-alt tool-icon"></i> Routine quotidienne <span class="new-badge">Nouveau</span></h2>
                 <p>Planifiez et suivez vos activités quotiennes pour un équilibre optimal.</p>
                 <div class="goal-progress" id="routineGoal"></div>
@@ -538,7 +538,7 @@ gratitude</h2>
             document.getElementById('backBtn').href = `/v1/?v=${encodeURIComponent(clientVersion)}`;
             // Ajouter le paramètre ?v= à tous les liens des outils
             const versionParam = `?v=${encodeURIComponent(clientVersion)}`;
-            document.getElementById('routineTool').href = `/v1/outils/routine-quotidienne.php${versionParam}`;
+            document.getElementById('routineTool').href = `/v1/outils/routine-quotidienne/index.php${versionParam}`;
             document.getElementById('emotionTool').href = `/v1/outils/journal-des-emotions.php${versionParam}`;
             document.getElementById('gratitudeTool').href = `/v1/outils/journal-de-gratitude.php${versionParam}`;
             document.getElementById('pyramideTool').href = `/v1/outils/pyramide-des-besoins.php${versionParam}`;
