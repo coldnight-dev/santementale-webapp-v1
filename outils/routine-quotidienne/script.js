@@ -131,7 +131,7 @@ function generateShareImage() {
     logoImg.onerror = function() {
         drawShareContent(ctx, canvas);
     };
-    logoImg.src = 'https://santementale.org/favicon.ico';
+    logoImg.src = '../../logo.png';
 }
 
 function drawShareContent(ctx, canvas) {
@@ -200,7 +200,7 @@ function drawShareContent(ctx, canvas) {
             if (result.success) {
                 const shareUrl = 'https://app.santementale.org/share/' + result.uid;
                 if (navigator.share) {
-                    navigator.share({ title: 'Ma progression Routines', url: shareUrl });
+                    navigator.share({ title: 'Routines quotidiennes', url: shareUrl });
                 } else {
                     prompt('Lien de partage:', shareUrl);
                 }
