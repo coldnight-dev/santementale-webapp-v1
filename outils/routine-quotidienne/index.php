@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Routines - SanteMentale.org | Mod v.0.11.4</title>
+    <title>Routines - SanteMentale.org</title>
     <link rel="icon" type="image/x-icon" href="https://santementale.org/favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
@@ -60,7 +60,7 @@
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-3px); }
         }
-        .material-symbols-outlined.routine-icon-animated { animation: float-drift 5s ease-in-out infinite; }
+        .material-icons.routine-icon-animated { animation: float-drift 5s ease-in-out infinite; }
         .badge-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -147,7 +147,7 @@
             font-weight: 700;
             color: #fff;
             text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-            z-index: 2;
+            z-index: 10;
         }
         .achievement-notification {
             position: fixed;
@@ -358,19 +358,71 @@
             background: #27272a;
             transform: translateX(4px);
         }
-        .calendar-day.has-data {
-            cursor: pointer;
-        }
-        .calendar-day.has-data:hover {
-            transform: scale(1.1);
-        }
-        .month-nav-disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
         /* NOUVEAU v0.11 - Canvas caché pour partage */
         #shareCanvas {
             display: none;
+        }
+        /* NOUVEAU v0.11.5 - Pagination icônes */
+        .icon-pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            margin-top: 16px;
+        }
+        .icon-pagination-btn {
+            background: #3B82F6;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        .icon-pagination-btn:hover {
+            background: #2563eb;
+        }
+        .icon-pagination-btn:disabled {
+            background: #71717a;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        .icon-pagination-info {
+            font-size: 14px;
+            color: #666;
+            font-weight: 600;
+        }
+        .icon-picker-container {
+            position: relative;
+            overflow: hidden;
+            touch-action: pan-y;
+        }
+        /* NOUVEAU v0.11.5 - Style pour limites popup */
+        .limit-warning-popup .popup-content {
+            background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
+            color: white;
+            text-align: left;
+        }
+        .limit-warning-popup .popup-content h3 {
+            color: white;
+            text-align: center;
+            margin-bottom: 16px;
+            font-size: 22px;
+        }
+        .limit-warning-popup .popup-content p {
+            color: white;
+            margin-bottom: 12px;
+        }
+        .limit-warning-popup .popup-content strong {
+            color: #fca5a5;
+        }
+        .limit-warning-popup .close-btn {
+            background: #3B82F6;
+            color: white;
         }
     </style>
 </head>
@@ -387,7 +439,10 @@
             <label style="display:block;margin-bottom:5px;font-weight:bold;">Nom de la routine</label>
             <input type="text" id="routineNameInput" class="task-input" placeholder="Ex: Routine du matin">
             <label style="display:block;margin:10px 0 5px;font-weight:bold;">Icône</label>
-            <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:15px;" id="iconPicker"></div>
+            <div class="icon-picker-container">
+                <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:15px;" id="iconPicker"></div>
+            </div>
+            <div class="icon-pagination" id="routineIconPagination"></div>
             <button class="close-btn" onclick="saveRoutineEdit()" style="width:100%;background:#3B82F6;color:white;">Enregistrer</button>
             <button class="close-btn" onclick="closePopup('editRoutinePopup')" style="width:100%;">Annuler</button>
         </div>
@@ -396,7 +451,11 @@
         <div class="popup-content" style="text-align:left;">
             <h3 class="title-genos" style="font-weight:bold;margin-bottom:20px;text-align:center;font-size:28px;">Ajouter une tâche</h3>
             <input type="text" id="taskNameInput" class="task-input" placeholder="Titre — Ex.: Méditation">
-            <div style="display:flex;flex-wrap:wrap;gap:10px;margin:15px 0;" id="taskIconPicker"></div>
+            <label style="display:block;margin:15px 0 10px;font-weight:bold;">Choisir une icône</label>
+            <div class="icon-picker-container">
+                <div style="display:flex;flex-wrap:wrap;gap:10px;margin:15px 0;" id="taskIconPicker"></div>
+            </div>
+            <div class="icon-pagination" id="taskIconPagination"></div>
             <label style="display:block;margin-bottom:5px;font-weight:bold;">Durée estimée (minutes)</label>
             <input type="number" id="taskDurationInput" class="task-input" placeholder="15" min="0">
             <button class="close-btn" onclick="saveNewTask()" style="width:100%;background:#3B82F6;color:white;">Ajouter</button>
@@ -409,7 +468,10 @@
             <label style="display:block;margin-bottom:5px;font-weight:bold;">Nom de la tâche</label>
             <input type="text" id="editTaskNameInput" class="task-input task-name-sofia" placeholder="Ex: Méditation">
             <label style="display:block;margin:10px 0 5px;font-weight:bold;">Icône</label>
-            <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:15px;" id="editTaskIconPicker"></div>
+            <div class="icon-picker-container">
+                <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:15px;" id="editTaskIconPicker"></div>
+            </div>
+            <div class="icon-pagination" id="editTaskIconPagination"></div>
             <label style="display:block;margin-bottom:5px;font-weight:bold;">Durée estimée (minutes)</label>
             <input type="number" id="editTaskDurationInput" class="task-input" placeholder="15" min="0">
             <button class="close-btn" onclick="saveTaskEdit()" style="width:100%;background:#3B82F6;color:white;">Enregistrer</button>
@@ -425,16 +487,25 @@
     
     <!-- NOUVEAU v0.11 - Popup détails jour historique -->
     <div id="dayDetailPopup" class="popup">
-        <div class="popup-content" style="text-align:left; position: relative;">
-            <button onclick="closePopup('dayDetailPopup')" style="position: absolute; top: 10px; right: 10px; background: none; border: none; cursor: pointer; font-size: 24px; color: #000; width: auto; padding: 0; margin: 0;">✕</button>
-            <h3 id="dayDetailTitle" style="font-weight:bold;margin-bottom:15px;text-align:center;margin-top:10px;"></h3>
+        <div class="popup-content" style="text-align:left;">
+            <h3 id="dayDetailTitle" style="font-weight:bold;margin-bottom:15px;text-align:center;"></h3>
             <div id="dayDetailContent"></div>
+            <button class="close-btn" onclick="closePopup('dayDetailPopup')" style="width:100%;margin-top:15px;">Fermer</button>
+        </div>
+    </div>
+    
+    <!-- NOUVEAU v0.11.5 - Popup limite capacité -->
+    <div id="limitWarningPopup" class="popup limit-warning-popup">
+        <div class="popup-content">
+            <h3>⚠️ Limite atteinte</h3>
+            <div id="limitWarningContent"></div>
+            <button class="close-btn" onclick="closePopup('limitWarningPopup')" style="width:100%;margin-top:15px;">J'ai compris</button>
         </div>
     </div>
     
     <div id="achievementNotification" class="achievement-notification">
         <div style="display:flex;align-items:center;gap:12px;">
-            <span class="material-symbols-outlined" style="font-size:40px;">emoji_events</span>
+            <span class="material-icons" style="font-size:40px;">emoji_events</span>
             <div>
                 <div style="font-weight:bold;font-size:16px;">Achievement débloqué !</div>
                 <div id="achievementText" style="font-size:14px;margin-top:4px;"></div>
@@ -443,7 +514,7 @@
     </div>
     <div id="helpModalPopup" class="popup help-modal-popup">
         <div class="popup-content">
-            <div class="help-modal-title">Routines — v0.11</div>
+            <div class="help-modal-title">Routines — v0.11.5-beta</div>
             <div class="help-modal-buttons">
                 <button class="help-modal-btn primary" onclick="showWhatsNew()">Quoi de neuf ?</button>
                 <button class="help-modal-btn primary" onclick="startTutorial();closePopup('helpModalPopup');">Tutoriel</button>

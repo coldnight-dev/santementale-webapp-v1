@@ -1,10 +1,13 @@
 // ========================================
-// ROUTINES v0.11.4 - Script FINAL COMPLET
+// ROUTINES v0.11.5-beta - Script FINAL COMPLET
 // ========================================
 
-const MODULE_REVISION = '0.11';
-const ICONS = ['sunny', 'clear_night', 'favorite', 'coffee', 'menu_book', 'fitness_center', 'water_drop', 'music_note', 'brush', 'phone', 'email', 'shopping_cart', 'nature', 'computer', 'sports_esports', 'photo_camera', 'edit', 'palette', 'home', 'work', 'restaurant', 'bed', 'self_improvement', 'spa', 'pets', 'alarm', 'directions_run', 'school', 'dining', 'psychology'];
-const TASK_ICONS = ['self_improvement', 'spa', 'favorite', 'coffee', 'restaurant', 'water_drop', 'fitness_center', 'directions_run', 'bed', 'alarm', 'menu_book', 'edit', 'music_note', 'brush', 'palette', 'shower', 'clean_hands', 'medication', 'healing', 'psychology', 'sunny', 'clear_night', 'nature', 'park', 'pets', 'phone', 'group', 'home', 'work', 'school'];
+const MODULE_REVISION = '0.11.5-beta';
+const MAX_ROUTINES = 10;
+const MAX_TASKS = 25;
+const ICONS = ['wb_sunny', 'nightlight', 'favorite', 'local_cafe', 'book', 'fitness_center', 'water_drop', 'music_note', 'brush', 'phone', 'email', 'shopping_cart', 'nature', 'laptop', 'sports_esports', 'camera_alt', 'edit', 'palette', 'home', 'work', 'restaurant', 'bed', 'self_improvement', 'spa', 'pets', 'alarm', 'directions_run', 'school', 'local_dining', 'psychology'];
+const TASK_ICONS = ['self_improvement', 'spa', 'favorite_border', 'local_cafe', 'restaurant', 'water_drop', 'fitness_center', 'directions_run', 'bedtime', 'alarm', 'book', 'edit', 'music_note', 'brush', 'palette', 'shower', 'clean_hands', 'medication', 'healing', 'psychology', 'wb_sunny', 'nightlight', 'nature', 'park', 'pets', 'phone', 'people', 'home', 'work', 'school', 'emoji_emotions', 'mood', 'sentiment_satisfied', 'local_florist', 'eco', 'grass', 'yard', 'forest', 'wb_twilight', 'light_mode', 'dark_mode', 'bedtime_off', 'coffee', 'lunch_dining', 'dinner_dining', 'breakfast_dining', 'fastfood', 'cake', 'liquor', 'wine_bar', 'tea', 'takeout_dining', 'grocery', 'shopping_bag', 'checkroom', 'dry_cleaning', 'iron', 'wash', 'bathtub', 'hot_tub', 'pool', 'waves', 'surfing', 'kayaking', 'sailing', 'hiking', 'downhill_skiing', 'snowboarding', 'ice_skating', 'sledding', 'sports_soccer', 'sports_basketball', 'sports_tennis', 'sports_volleyball', 'sports_baseball', 'sports_football', 'sports_hockey', 'sports_golf', 'sports_martial_arts', 'sports_gymnastics', 'sports_handball', 'bicycle', 'electric_bike', 'electric_scooter', 'rollerskating', 'skateboard', 'meditation', 'yoga', 'child_care', 'face', 'sentiment_very_satisfied', 'volunteer_activism', 'diversity_3', 'handshake'];
+const ICONS_PER_PAGE = 24;
 const BADGES = [
     { id: 'first_step', name: 'Premier Pas', icon: '🎯', description: 'Compléter votre première tâche', requirement: 'tasks', threshold: 1 },
     { id: 'dedicated', name: 'Dévoué', icon: '💪', description: 'Compléter 50 tâches', requirement: 'tasks', threshold: 50 },
@@ -21,46 +24,82 @@ const XP_PER_TASK = 10;
 const XP_PER_LEVEL = 100;
 const TUTORIAL_STEPS = [
     { target: '.xp-bar', title: 'Système XP & Niveaux', description: 'Gagnez de l\'expérience en complétant des tâches et débloquez des niveaux ! Chaque tâche complétée = +10 XP.', anchor: 'bottom' },
+    { target: '[onclick*="calendar"]', title: 'Onglet Calendrier', description: 'Visualisez votre historique complet et consultez vos performances passées.', anchor: 'bottom' },
     { target: '[onclick*="stats"]', title: 'Onglet Statistiques', description: 'Consultez votre progression, votre série de jours et le temps total investi dans vos routines.', anchor: 'bottom' },
     { target: '[onclick*="goals"]', title: 'Onglet Achievements', description: 'Débloquez des badges exclusifs en atteignant des objectifs. 10 achievements à conquérir !', anchor: 'bottom' },
     { target: 'h1', title: 'Besoin d\'aide ?', description: 'Cliquez sur le bouton d\'aide pour accéder au menu. Vous pouvez relancer le tutoriel à tout moment !', anchor: 'bottom' }
 ];
 const WHATS_NEW = [
-    { icon: '📸', title: 'Partage de progression', desc: 'Générez une belle image de vos stats à partager' },
-    { icon: '📅', title: 'Historique détaillé', desc: 'Naviguez dans vos mois précédents et consultez chaque jour' },
-    { icon: '⭐', title: 'Système XP & Niveaux', desc: 'Progressez en complétant des tâches' },
-    { icon: '🎉', title: 'Confettis à 100%', desc: 'Célébrez vos journées parfaites' }
+    { icon: '🔢', title: 'Limites optimisées', desc: 'Maximum de 10 routines et 25 tâches pour une meilleure organisation' },
+    { icon: '🎨', title: '100 icônes disponibles', desc: 'Grande variété d\'icônes avec pagination intuitive' },
+    { icon: '📊', title: 'Vue améliorée', desc: 'Icônes plus grandes, checkbox à droite, pourcentages colorisés' },
+    { icon: '⚙️', title: 'Compteurs de capacité', desc: 'Voyez l\'utilisation de vos routines et tâches en temps réel' }
 ];
 
 let state = {
     routines: [], history: [], view: 'today', currentDate: new Date().toLocaleDateString('fr-FR'),
     editingRoutineId: null, addingTaskToRoutine: null, editingTaskRoutineId: null, editingTaskId: null,
-    selectedRoutineIcon: 'sunny', selectedTaskIcon: 'self_improvement', selectedEditTaskIcon: 'self_improvement',
+    selectedRoutineIcon: 'wb_sunny', selectedTaskIcon: 'self_improvement', selectedEditTaskIcon: 'self_improvement',
     calendarDate: new Date(), streak: 0, xp: 0, level: 1, unlockedBadges: [], totalTasksCompleted: 0,
-    perfectDaysCount: 0, statsChart: null, tutorialStep: -1, lastSeenVersion: '0', isFirstTimeView: false
+    perfectDaysCount: 0, statsChart: null, tutorialStep: -1, lastSeenVersion: '0', isFirstTimeView: false,
+    routineIconPage: 0, taskIconPage: 0, editTaskIconPage: 0
 };
 
 function initDefaultRoutines() {
     return [
-        { id: 'morning', name: 'Routine Matin', icon: 'sunny', tasks: [
-            { id: 't1', name: 'Se réveiller', icon: 'bed', duration: 0, completed: false },
+        { id: 'morning', name: 'Routine Matin', icon: 'wb_sunny', tasks: [
+            { id: 't1', name: 'Se réveiller', icon: 'bedtime', duration: 0, completed: false },
             { id: 't2', name: 'Boire un verre d\'eau', icon: 'water_drop', duration: 2, completed: false },
-            { id: 't3', name: 'Petit déjeuner', icon: 'coffee', duration: 20, completed: false },
+            { id: 't3', name: 'Petit déjeuner', icon: 'local_cafe', duration: 20, completed: false },
             { id: 't4', name: 'Hygiène', icon: 'shower', duration: 15, completed: false }
         ]},
-        { id: 'day', name: 'Routine Journée', icon: 'computer', tasks: [
+        { id: 'day', name: 'Routine Journée', icon: 'laptop', tasks: [
             { id: 't5', name: 'Planifier la journée', icon: 'edit', duration: 10, completed: false },
-            { id: 't6', name: 'Travail/Études', icon: 'computer', duration: 240, completed: false },
+            { id: 't6', name: 'Travail/Études', icon: 'laptop', duration: 240, completed: false },
             { id: 't7', name: 'Pause déjeuner', icon: 'restaurant', duration: 45, completed: false },
             { id: 't8', name: 'Activité physique', icon: 'fitness_center', duration: 30, completed: false }
         ]},
-        { id: 'evening', name: 'Routine Soir', icon: 'clear_night', tasks: [
+        { id: 'evening', name: 'Routine Soir', icon: 'nightlight', tasks: [
             { id: 't9', name: 'Dîner', icon: 'restaurant', duration: 30, completed: false },
-            { id: 't10', name: 'Moment détente', icon: 'menu_book', duration: 60, completed: false },
+            { id: 't10', name: 'Moment détente', icon: 'book', duration: 60, completed: false },
             { id: 't11', name: 'Préparer le lendemain', icon: 'edit', duration: 15, completed: false },
-            { id: 't12', name: 'Coucher', icon: 'bed', duration: 0, completed: false }
+            { id: 't12', name: 'Coucher', icon: 'bedtime', duration: 0, completed: false }
         ]}
     ];
+}
+
+function getTotalTaskCount() {
+    let total = 0;
+    state.routines.forEach(routine => {
+        total += routine.tasks.length;
+    });
+    return total;
+}
+
+function showLimitWarning(type) {
+    let content = '';
+    if (type === 'routines') {
+        content = '<p><strong>Limite de routines atteinte !</strong></p>';
+        content += '<p>Vous avez atteint la limite de <strong>' + MAX_ROUTINES + ' routines</strong>.</p>';
+        content += '<p style="margin-top:16px;">💡 <strong>Conseil :</strong> Essayez de regrouper vos activités similaires dans une même routine. Par exemple :</p>';
+        content += '<ul style="margin-left:20px;margin-top:8px;line-height:1.8;">';
+        content += '<li>Routine "Bien-être" : méditation + yoga + lecture</li>';
+        content += '<li>Routine "Productivité" : planification + travail + pause</li>';
+        content += '<li>Routine "Soins personnels" : douche + skincare + coiffure</li>';
+        content += '</ul>';
+    } else if (type === 'tasks') {
+        content = '<p><strong>Limite de tâches atteinte !</strong></p>';
+        content += '<p>Vous avez atteint la limite de <strong>' + MAX_TASKS + ' tâches</strong> au total.</p>';
+        content += '<p style="margin-top:16px;">💡 <strong>Conseil :</strong> Combinez plusieurs petites tâches en une seule. Par exemple :</p>';
+        content += '<ul style="margin-left:20px;margin-top:8px;line-height:1.8;">';
+        content += '<li>"Se brosser les dents" + "Se raser" + "Prendre une douche" = <strong>"Hygiène matinale"</strong></li>';
+        content += '<li>"Ranger le bureau" + "Organiser les documents" = <strong>"Organisation de l\'espace"</strong></li>';
+        content += '<li>"Étirements" + "Respiration" + "Méditation" = <strong>"Routine bien-être"</strong></li>';
+        content += '</ul>';
+        content += '<p style="margin-top:16px;">Cela vous aidera à mieux structurer vos routines et à rester concentré sur l\'essentiel ! ✨</p>';
+    }
+    document.getElementById('limitWarningContent').innerHTML = content;
+    openPopup('limitWarningPopup');
 }
 
 function openPopup(id) { document.getElementById(id).style.display = 'flex'; }
@@ -131,11 +170,11 @@ function generateShareImage() {
     logoImg.onerror = function() {
         drawShareContent(ctx, canvas);
     };
-    logoImg.src = '../../logo.png';
+    logoImg.src = 'https://santementale.org/favicon.ico';
 }
 
 function drawShareContent(ctx, canvas) {
-const username = localStorage.getItem('username') || localStorage.getItem('device_uuid')?.substring(0, 8) || 'Utilisateur';
+    const username = 'Utilisateur';
     const prideQuotes = [
         'Voyez comment ' + username + ' a progressé !',
         'Regardez les accomplissements de ' + username + ' !',
@@ -148,7 +187,7 @@ const username = localStorage.getItem('username') || localStorage.getItem('devic
     ctx.fillText(quote, canvas.width / 2, 220);
 
     ctx.fillStyle = '#ffffff'; ctx.font = 'bold 80px sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText('Routines quotidiennes', canvas.width / 2, 320);
+    ctx.fillText('Ma Progression Routines', canvas.width / 2, 320);
 
     ctx.font = 'bold 120px sans-serif'; ctx.fillStyle = '#fbbf24';
     ctx.fillText('⭐ Niveau ' + state.level, canvas.width / 2, 480);
@@ -200,7 +239,7 @@ const username = localStorage.getItem('username') || localStorage.getItem('devic
             if (result.success) {
                 const shareUrl = 'https://app.santementale.org/share/' + result.uid;
                 if (navigator.share) {
-                    navigator.share({ title: 'Routines quotidiennes', url: shareUrl });
+                    navigator.share({ title: 'Ma progression Routines', url: shareUrl });
                 } else {
                     prompt('Lien de partage:', shareUrl);
                 }
@@ -215,21 +254,17 @@ const username = localStorage.getItem('username') || localStorage.getItem('devic
 
 function showDayDetail(dateStr) {
     const dayData = state.history.find(h => h.date === dateStr); if (!dayData) return;
-    
-    // Scroll vers le haut
-    document.getElementById('dayDetailContent').scrollTop = 0;
-    
     document.getElementById('dayDetailTitle').textContent = 'Détails du ' + dateStr;
 
     let html = '', totalTasks = 0, completedTasks = 0;
     state.routines.forEach(routine => {
         const routineData = dayData.routines[routine.id]; if (!routineData) return;
         html += '<div style="margin-bottom:20px;"><h4 style="font-weight:bold;margin-bottom:10px;display:flex;align-items:center;gap:8px;">';
-        html += '<span class="material-symbols-outlined" style="color:#3B82F6;">' + routine.icon + '</span>' + routine.name + '</h4><div style="margin-left:32px;">';
+        html += '<span class="material-icons" style="color:#3B82F6;">' + routine.icon + '</span>' + routine.name + '</h4><div style="margin-left:32px;">';
         routine.tasks.forEach(task => {
             totalTasks++; const completed = routineData[task.id]; if (completed) completedTasks++;
             html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:8px;background:' + 
-                (completed ? '#dcfce7' : '#fee2e2') + ';border-radius:6px;"><span class="material-symbols-outlined" style="font-size:20px;color:' + 
+                (completed ? '#dcfce7' : '#fee2e2') + ';border-radius:6px;"><span class="material-icons" style="font-size:20px;color:' + 
                 (completed ? '#10B981' : '#EF4444') + ';">' + (completed ? 'check_circle' : 'cancel') + '</span>' +
                 '<span style="color:#000;">' + task.name + '</span></div>';
         });
@@ -237,7 +272,13 @@ function showDayDetail(dateStr) {
     });
 
     const completion = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-    html = '<div style="background:#3B82F6;color:white;padding:12px;border-radius:8px;margin-bottom:20px;text-align:center;font-weight:bold;font-size:18px;">Complétion : ' + 
+    let completionColor = '#71717a';
+    if (completion >= 76) completionColor = '#10B981';
+    else if (completion >= 51) completionColor = '#F59E0B';
+    else if (completion >= 26) completionColor = '#EF4444';
+    else if (completion > 0) completionColor = '#3B82F6';
+    
+    html = '<div style="background:' + completionColor + ';color:white;padding:12px;border-radius:8px;margin-bottom:20px;text-align:center;font-weight:bold;font-size:18px;">Complétion : ' + 
         completion + '%</div>' + html;
     document.getElementById('dayDetailContent').innerHTML = html; openPopup('dayDetailPopup');
 }
@@ -249,7 +290,7 @@ function renderHistoryList() {
     });
 
     let html = '<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4">';
-    html += '<h3 class="font-bold mb-3"><span class="material-symbols-outlined mr-2" style="vertical-align:middle;">history</span>Historique complet</h3>';
+    html += '<h3 class="font-bold mb-3"><span class="material-icons mr-2" style="vertical-align:middle;">history</span>Historique complet</h3>';
     if (sortedHistory.length === 0) {
         html += '<p class="text-zinc-500 text-center py-8">Aucun historique disponible</p>';
     } else {
@@ -343,8 +384,47 @@ function toggleTask(routineId, taskId) {
     calcStreak(); checkBadges(); render(); return false;
 }
 
-function openEditRoutine(routineId) { state.editingRoutineId = routineId; const routine = state.routines.find(r => r.id === routineId);
-    document.getElementById('routineNameInput').value = routine.name; state.selectedRoutineIcon = routine.icon; renderIconPicker(); openPopup('editRoutinePopup'); }
+function renderIconPaginationControls(iconArray, currentPage, onPageChange, containerId) {
+    const totalPages = Math.ceil(iconArray.length / ICONS_PER_PAGE);
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    let html = '';
+    if (totalPages > 1) {
+        html += '<button class="icon-pagination-btn" ' + (currentPage === 0 ? 'disabled' : '') + ' onclick="' + onPageChange + '(-1)"><span class="material-icons" style="font-size:18px;">chevron_left</span></button>';
+        html += '<span class="icon-pagination-info">Page ' + (currentPage + 1) + ' / ' + totalPages + '</span>';
+        html += '<button class="icon-pagination-btn" ' + (currentPage === totalPages - 1 ? 'disabled' : '') + ' onclick="' + onPageChange + '(1)"><span class="material-icons" style="font-size:18px;">chevron_right</span></button>';
+    }
+    container.innerHTML = html;
+}
+
+function changeRoutineIconPage(direction) {
+    const totalPages = Math.ceil(ICONS.length / ICONS_PER_PAGE);
+    state.routineIconPage = Math.max(0, Math.min(totalPages - 1, state.routineIconPage + direction));
+    renderIconPicker();
+}
+
+function changeTaskIconPage(direction) {
+    const totalPages = Math.ceil(TASK_ICONS.length / ICONS_PER_PAGE);
+    state.taskIconPage = Math.max(0, Math.min(totalPages - 1, state.taskIconPage + direction));
+    renderTaskIconPicker();
+}
+
+function changeEditTaskIconPage(direction) {
+    const totalPages = Math.ceil(TASK_ICONS.length / ICONS_PER_PAGE);
+    state.editTaskIconPage = Math.max(0, Math.min(totalPages - 1, state.editTaskIconPage + direction));
+    renderEditTaskIconPicker();
+}
+
+function openEditRoutine(routineId) { 
+    state.editingRoutineId = routineId; 
+    state.routineIconPage = 0;
+    const routine = state.routines.find(r => r.id === routineId);
+    document.getElementById('routineNameInput').value = routine.name; 
+    state.selectedRoutineIcon = routine.icon; 
+    renderIconPicker(); 
+    openPopup('editRoutinePopup'); 
+}
 
 function saveRoutineEdit() {
     const routine = state.routines.find(r => r.id === state.editingRoutineId);
@@ -353,40 +433,81 @@ function saveRoutineEdit() {
 }
 
 function renderIconPicker() {
-    document.getElementById('iconPicker').innerHTML = ICONS.map(icon =>
+    const startIdx = state.routineIconPage * ICONS_PER_PAGE;
+    const endIdx = Math.min(startIdx + ICONS_PER_PAGE, ICONS.length);
+    const iconsToShow = ICONS.slice(startIdx, endIdx);
+    
+    document.getElementById('iconPicker').innerHTML = iconsToShow.map(icon =>
         '<div class="icon-option ' + (state.selectedRoutineIcon === icon ? 'selected' : '') + '" onclick="state.selectedRoutineIcon=\'' + icon + '\';renderIconPicker();">' +
-        '<span class="material-symbols-outlined" style="font-size:24px;color:black;">' + icon + '</span></div>'
+        '<span class="material-icons" style="font-size:24px;color:black;">' + icon + '</span></div>'
     ).join('');
+    
+    renderIconPaginationControls(ICONS, state.routineIconPage, 'changeRoutineIconPage', 'routineIconPagination');
 }
 
-function openAddTask(routineId) { state.addingTaskToRoutine = routineId; state.selectedTaskIcon = 'self_improvement';
-    document.getElementById('taskNameInput').value = ''; document.getElementById('taskDurationInput').value = ''; renderTaskIconPicker(); openPopup('addTaskPopup'); }
+function openAddTask(routineId) { 
+    if (getTotalTaskCount() >= MAX_TASKS) {
+        showLimitWarning('tasks');
+        return;
+    }
+    state.addingTaskToRoutine = routineId; 
+    state.selectedTaskIcon = 'self_improvement';
+    state.taskIconPage = 0;
+    document.getElementById('taskNameInput').value = ''; 
+    document.getElementById('taskDurationInput').value = ''; 
+    renderTaskIconPicker(); 
+    openPopup('addTaskPopup'); 
+}
 
 function renderTaskIconPicker() {
-    document.getElementById('taskIconPicker').innerHTML = TASK_ICONS.map(icon =>
+    const startIdx = state.taskIconPage * ICONS_PER_PAGE;
+    const endIdx = Math.min(startIdx + ICONS_PER_PAGE, TASK_ICONS.length);
+    const iconsToShow = TASK_ICONS.slice(startIdx, endIdx);
+    
+    document.getElementById('taskIconPicker').innerHTML = iconsToShow.map(icon =>
         '<div class="icon-option ' + (state.selectedTaskIcon === icon ? 'selected' : '') + '" onclick="state.selectedTaskIcon=\'' + icon + '\';renderTaskIconPicker();">' +
-        '<span class="material-symbols-outlined" style="font-size:24px;color:black;">' + icon + '</span></div>'
+        '<span class="material-icons" style="font-size:24px;color:black;">' + icon + '</span></div>'
     ).join('');
+    
+    renderIconPaginationControls(TASK_ICONS, state.taskIconPage, 'changeTaskIconPage', 'taskIconPagination');
 }
 
 function saveNewTask() {
     const name = document.getElementById('taskNameInput').value.trim(); if (!name) return;
+    if (getTotalTaskCount() >= MAX_TASKS) {
+        showLimitWarning('tasks');
+        return;
+    }
     const durationVal = document.getElementById('taskDurationInput').value; const duration = durationVal === '' ? 15 : parseInt(durationVal);
     const routine = state.routines.find(r => r.id === state.addingTaskToRoutine);
     const newTask = { id: 't' + Date.now(), name: name, icon: state.selectedTaskIcon, duration: duration, completed: false };
     routine.tasks.push(newTask); localStorage.setItem('routines', JSON.stringify(state.routines)); closePopup('addTaskPopup'); render();
 }
 
-function openEditTask(routineId, taskId) { state.editingTaskRoutineId = routineId; state.editingTaskId = taskId;
-    const routine = state.routines.find(r => r.id === routineId); const task = routine.tasks.find(t => t.id === taskId);
-    document.getElementById('editTaskNameInput').value = task.name; document.getElementById('editTaskDurationInput').value = task.duration;
-    state.selectedEditTaskIcon = task.icon; renderEditTaskIconPicker(); openPopup('editTaskPopup'); }
+function openEditTask(routineId, taskId) { 
+    state.editingTaskRoutineId = routineId; 
+    state.editingTaskId = taskId;
+    state.editTaskIconPage = 0;
+    const routine = state.routines.find(r => r.id === routineId); 
+    const task = routine.tasks.find(t => t.id === taskId);
+    document.getElementById('editTaskNameInput').value = task.name; 
+    document.getElementById('editTaskDurationInput').value = task.duration;
+    state.selectedEditTaskIcon = task.icon; 
+    renderEditTaskIconPicker(); 
+    openPopup('editTaskPopup'); 
+}
 
 function renderEditTaskIconPicker() {
-    document.getElementById('editTaskIconPicker').innerHTML = TASK_ICONS.map(icon =>
+    const startIdx = state.editTaskIconPage * ICONS_PER_PAGE;
+    const endIdx = Math.min(startIdx + ICONS_PER_PAGE, TASK_ICONS.length);
+    const iconsToShow = TASK_ICONS.slice(startIdx, endIdx);
+    
+    document.getElementById('editTaskIconPicker').innerHTML = iconsToShow.map(icon =>
         '<div class="icon-option ' + (state.selectedEditTaskIcon === icon ? 'selected' : '') + '" onclick="state.selectedEditTaskIcon=\'' + icon + '\';renderEditTaskIconPicker();">' +
-        '<span class="material-symbols-outlined" style="font-size:24px;color:black;">' + icon + '</span></div>'
+        '<span class="material-icons" style="font-size:24px;color:black;">' + icon + '</span></div>'
     ).join('');
+    
+    renderIconPaginationControls(TASK_ICONS, state.editTaskIconPage, 'changeEditTaskIconPage', 'editTaskIconPagination');
 }
 
 function saveTaskEdit() {
@@ -406,8 +527,12 @@ function deleteRoutine(routineId) { if (!confirm('Supprimer cette routine compl�
 }
 
 function addNewRoutine() {
+    if (state.routines.length >= MAX_ROUTINES) {
+        showLimitWarning('routines');
+        return;
+    }
     const name = prompt('Nom de la nouvelle routine:'); if (!name) return;
-    const newRoutine = { id: 'r' + Date.now(), name: name, icon: 'sunny', tasks: [] };
+    const newRoutine = { id: 'r' + Date.now(), name: name, icon: 'wb_sunny', tasks: [] };
     state.routines.push(newRoutine); localStorage.setItem('routines', JSON.stringify(state.routines)); checkBadges(); render();
 }
 
@@ -438,24 +563,14 @@ function calcStreak() {
 
 function renderCal() {
     const y = state.calendarDate.getFullYear(), m = state.calendarDate.getMonth();
-    const today = new Date();
-    const isCurrentMonth = y === today.getFullYear() && m === today.getMonth();
     const first = new Date(y, m, 1), last = new Date(y, m + 1, 0); const days = last.getDate(), start = first.getDay();
     let h = '<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4">';
     h += '<div class="flex items-center justify-between mb-4">';
-    h += '<button onclick="state.calendarDate.setMonth(state.calendarDate.getMonth()-1);render();" class="text-blue-400"><span class="material-symbols-outlined">chevron_left</span></button>';
+    h += '<button onclick="state.calendarDate.setMonth(state.calendarDate.getMonth()-1);render();" class="text-blue-400"><span class="material-icons">chevron_left</span></button>';
     h += '<h3 class="font-bold">' + first.toLocaleDateString('fr-FR', {month:'long',year:'numeric'}) + '</h3>';
-    
-    // Bouton suivant conditionnel
-    if (isCurrentMonth) {
-        h += '<button class="text-blue-400 month-nav-disabled"><span class="material-symbols-outlined">chevron_right</span></button>';
-    } else {
-        h += '<button onclick="state.calendarDate.setMonth(state.calendarDate.getMonth()+1);render();" class="text-blue-400"><span class="material-symbols-outlined">chevron_right</span></button>';
-    }
-    
+    h += '<button onclick="state.calendarDate.setMonth(state.calendarDate.getMonth()+1);render();" class="text-blue-400"><span class="material-icons">chevron_right</span></button>';
     h += '</div><div class="grid grid-cols-7 gap-1 text-center text-xs mb-2 text-zinc-500"><div>D</div><div>L</div><div>M</div><div>M</div><div>J</div><div>V</div><div>S</div></div>';
-    h += '<div class="grid grid-cols-7 gap-1 calendar-grid">';
-    
+    h += '<div class="grid grid-cols-7 gap-1">';
     for (let i = 0; i < start; i++) h += '<div></div>';
     for (let d = 1; d <= days; d++) {
         const dt = new Date(y, m, d), ds = dt.toLocaleDateString('fr-FR'); const dayData = state.history.find(h => h.date === ds);
@@ -465,27 +580,15 @@ function renderCal() {
             })); completion = total > 0 ? completed / total : 0;
         }
         let bg = '#18181b', txt = '#a1a1aa';
-        if (completion > 0) { 
-            if (completion >= 0.76) { bg = '#10B981'; txt = '#fff'; }
+        if (completion > 0) { if (completion >= 0.76) { bg = '#10B981'; txt = '#fff'; }
             else if (completion >= 0.51) { bg = '#F59E0B'; txt = '#fff'; }
-            else if (completion >= 0.26) { bg = '#EF4444'; txt = '#fff'; } 
-            else { bg = '#3B82F6'; txt = '#fff'; }
+            else if (completion >= 0.26) { bg = '#EF4444'; txt = '#fff'; } else { bg = '#3B82F6'; txt = '#fff'; }
         }
-        const isToday = ds === state.currentDate;
-        
-        // Rendre les jours avec données cliquables
-        if (completion > 0) {
-            h += '<div class="calendar-day has-data" style="background-color:' + bg + ';color:' + txt + ';' + (isToday ? 'border:2px solid #3B82F6;' : '') + '" title="' + Math.round(completion*100) + '%" onclick="showDayDetail(\'' + ds + '\')">' + d + '</div>';
-        } else {
-            h += '<div class="calendar-day" style="background-color:' + bg + ';color:' + txt + ';' + (isToday ? 'border:2px solid #3B82F6;' : '') + '" title="' + Math.round(completion*100) + '%">' + d + '</div>';
-        }
+        h += '<div class="calendar-day" style="background-color:' + bg + ';color:' + txt + ';" title="' + Math.round(completion*100) + '%">' + d + '</div>';
     }
-    
     h += '</div><div class="mt-3 text-xs text-zinc-500 flex gap-2"><div><span class="inline-block w-3 h-3 rounded" style="background:#3B82F6"></span> 0-25%</div>';
     h += '<div><span class="inline-block w-3 h-3 rounded" style="background:#EF4444"></span> 26-50%</div><div><span class="inline-block w-3 h-3 rounded" style="background:#F59E0B"></span> 51-75%</div>';
-    h += '<div><span class="inline-block w-3 h-3 rounded" style="background:#10B981"></span> 76-100%</div></div></div>'; 
-    
-    return h;
+    h += '<div><span class="inline-block w-3 h-3 rounded" style="background:#10B981"></span> 76-100%</div></div></div>'; return h;
 }
 
 function showBadgeDetail(badgeId) {
@@ -540,51 +643,60 @@ function renderStatsChart() {
 function render() {
     const app = document.getElementById('app'); const clientVersion = localStorage.getItem('client_version') || '1.web';
     let h = '<div class="bg-zinc-900 border-b border-zinc-800 sticky top-0 z-10"><div class="max-w-2xl mx-auto px-4 py-4 flex items-center gap-3">';
-    h += '<a href="/v1/outils/?v=' + clientVersion + '" class="back-btn" style="flex-shrink:0;"><span class="material-symbols-outlined">arrow_back</span></a>';
-    h += '<h1 class="text-3xl font-bold title-genos">Routines <button onclick="openPopup(\'helpModalPopup\')" style="background:none;border:none;cursor:pointer;color:#3B82F6;padding:0;margin-left:4px;vertical-align:baseline;"><span class="material-symbols-outlined" style="font-size:20px;">info</span></button></h1>';
+    h += '<a href="/v1/outils/?v=' + clientVersion + '" class="back-btn" style="flex-shrink:0;"><span class="material-icons">arrow_back</span></a>';
+    h += '<h1 class="text-3xl font-bold title-genos">Routines <button onclick="openPopup(\'helpModalPopup\')" style="background:none;border:none;cursor:pointer;color:#3B82F6;padding:0;margin-left:4px;vertical-align:baseline;"><span class="material-icons" style="font-size:20px;">info</span></button></h1>';
     h += '<div style="margin-left:auto;"><span class="material-symbols-outlined title-icon-animated" style="color:#3B82F6;font-size:32px;">routine</span></div></div></div>';
     h += '<div class="bg-zinc-900 border-b border-zinc-800"><div class="max-w-2xl mx-auto px-4"><div class="flex gap-1 justify-around">';
-    
-    // Réorganisation des onglets : today, stats, calendar, goals, manage (paramètres en dernier)
-    h += '<button onclick="state.view=\'today\';render();" class="py-4 px-3 transition-all ' + (state.view==='today'?'text-blue-400 border-b-2 border-blue-500':'text-zinc-500') + '"><span class="material-symbols-outlined" style="font-size:24px;">check_box</span></button>';
-    h += '<button onclick="state.view=\'stats\';render();" class="py-4 px-3 transition-all ' + (state.view==='stats'?'text-blue-400 border-b-2 border-blue-500':'text-zinc-500') + '"><span class="material-symbols-outlined" style="font-size:24px;">bar_chart</span></button>';
-    h += '<button onclick="state.view=\'calendar\';render();" class="py-4 px-3 transition-all ' + (state.view==='calendar'?'text-blue-400 border-b-2 border-blue-500':'text-zinc-500') + '"><span class="material-symbols-outlined" style="font-size:24px;">calendar_month</span></button>';
-    h += '<button onclick="state.view=\'goals\';render();" class="py-4 px-3 transition-all ' + (state.view==='goals'?'text-blue-400 border-b-2 border-blue-500':'text-zinc-500') + '"><span class="material-symbols-outlined" style="font-size:24px;">emoji_events</span></button>';
-    h += '<button onclick="state.view=\'manage\';render();" class="py-4 px-3 transition-all ' + (state.view==='manage'?'text-blue-400 border-b-2 border-blue-500':'text-zinc-500') + '"><span class="material-symbols-outlined" style="font-size:24px;">settings</span></button>';
-    
+    h += '<button onclick="state.view=\'today\';render();" class="py-4 px-3 transition-all ' + (state.view==='today'?'text-blue-400 border-b-2 border-blue-500':'text-zinc-500') + '"><span class="material-icons" style="font-size:24px;">check_box</span></button>';
+    h += '<button onclick="state.view=\'calendar\';render();" class="py-4 px-3 transition-all ' + (state.view==='calendar'?'text-blue-400 border-b-2 border-blue-500':'text-zinc-500') + '"><span class="material-icons" style="font-size:24px;">calendar_month</span></button>';
+    h += '<button onclick="state.view=\'stats\';render();" class="py-4 px-3 transition-all ' + (state.view==='stats'?'text-blue-400 border-b-2 border-blue-500':'text-zinc-500') + '"><span class="material-icons" style="font-size:24px;">bar_chart</span></button>';
+    h += '<button onclick="state.view=\'manage\';render();" class="py-4 px-3 transition-all ' + (state.view==='manage'?'text-blue-400 border-b-2 border-blue-500':'text-zinc-500') + '"><span class="material-icons" style="font-size:24px;">settings</span></button>';
+    h += '<button onclick="state.view=\'goals\';render();" class="py-4 px-3 transition-all ' + (state.view==='goals'?'text-blue-400 border-b-2 border-blue-500':'text-zinc-500') + '"><span class="material-icons" style="font-size:24px;">emoji_events</span></button>';
     h += '</div></div></div><div class="max-w-2xl mx-auto px-4 py-6">';
     const xpInLevel = state.xp % XP_PER_LEVEL; const xpPercent = (xpInLevel / XP_PER_LEVEL) * 100;
     h += '<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4 mb-4">';
-    h += '<div class="flex items-center justify-between mb-2" style="position:relative;z-index:1;"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-yellow-400" style="font-size:28px;">star</span><span class="font-bold text-lg">Niveau ' + state.level + '</span></div>';
+    h += '<div class="flex items-center justify-between mb-2" style="position:relative;z-index:1;"><div class="flex items-center gap-2"><span class="material-icons text-yellow-400" style="font-size:28px;">star</span><span class="font-bold text-lg">Niveau ' + state.level + '</span></div>';
     h += '<span class="text-sm text-zinc-400">' + xpInLevel + ' / ' + XP_PER_LEVEL + ' XP</span></div><div class="xp-bar"><div class="xp-fill" style="width:' + xpPercent + '%"></div><div class="xp-text">' + Math.round(xpPercent) + '%</div></div></div>';
 
     if (state.view === 'today') {
         const completion = getTodayCompletion();
+        let completionColor = '#71717a';
+        if (completion >= 76) completionColor = '#10B981';
+        else if (completion >= 51) completionColor = '#F59E0B';
+        else if (completion >= 26) completionColor = '#EF4444';
+        else if (completion > 0) completionColor = '#3B82F6';
+        
         h += '<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4 mb-4"><div class="flex items-center justify-between mb-2"><span class="font-bold">Progression du ' + 
-            new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' }) + '</span><span class="font-bold text-blue-400">' + completion + '%</span></div>';
+            new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' }) + '</span><span class="font-bold" style="color:' + completionColor + ';">' + completion + '%</span></div>';
         h += '<div class="w-full bg-zinc-800 rounded-full h-3 task-progress-bar"><div class="bg-blue-600 h-full rounded-full transition-all task-progress-fill" style="width:' + completion + '%"></div></div></div>';
         state.routines.forEach(routine => {
             const rc = getRoutineCompletion(routine.id);
+            let rcColor = '#71717a';
+            if (rc >= 76) rcColor = '#10B981';
+            else if (rc >= 51) rcColor = '#F59E0B';
+            else if (rc >= 26) rcColor = '#EF4444';
+            else if (rc > 0) rcColor = '#3B82F6';
+            
             h += '<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4 mb-4"><div class="flex items-center justify-between mb-3">';
-            h += '<div class="flex items-center gap-2"><span class="material-symbols-outlined text-2xl routine-icon-animated" style="color:#3B82F6;">' + routine.icon + 
-                '</span><h3 class="font-bold">' + routine.name + '</h3></div><span class="text-sm text-zinc-500">' + rc + '%</span></div>';
+            h += '<div class="flex items-center gap-2"><span class="material-icons text-2xl routine-icon-animated" style="color:#3B82F6;">' + routine.icon + 
+                '</span><h3 class="font-bold">' + routine.name + '</h3></div><span class="text-sm font-bold" style="color:' + rcColor + ';">' + rc + '%</span></div>';
             h += '<div class="space-y-2" id="tasks-' + routine.id + '">';
             routine.tasks.forEach(task => {
                 h += '<div class="flex items-center gap-3 p-3 bg-zinc-950 rounded-lg border border-zinc-800" data-task-id="' + task.id + '" data-routine-id="' + routine.id + '">';
-                h += '<label class="flex items-center cursor-pointer" style="user-select:none;"><input type="checkbox" ' + (task.completed ? 'checked' : '') + 
-                    ' class="w-5 h-5 checkbox-task" data-routine="' + routine.id + '" data-task="' + task.id + '"></label>';
-                h += '<span class="material-symbols-outlined text-xl">' + task.icon + '</span><div class="flex-1"><div class="font-semibold ' + 
+                h += '<span class="material-icons" style="font-size:48px;">' + task.icon + '</span><div class="flex-1"><div class="font-semibold task-name-sofia ' + 
                     (task.completed ? 'line-through text-zinc-500' : '') + '">' + task.name + '</div>';
-                h += '<div class="text-xs text-zinc-600">' + task.duration + '&nbsp;min&nbsp;&nbsp;&nbsp;+' + XP_PER_TASK + '&nbsp;XP</div></div></div>';
+                h += '<div class="text-xs text-zinc-600">' + task.duration + '&nbsp;min&nbsp;&nbsp;&nbsp;+' + XP_PER_TASK + '&nbsp;XP</div></div>';
+                h += '<label class="flex items-center cursor-pointer" style="user-select:none;"><input type="checkbox" ' + (task.completed ? 'checked' : '') + 
+                    ' class="w-6 h-6 checkbox-task" data-routine="' + routine.id + '" data-task="' + task.id + '"></label></div>';
             });
             h += '</div></div>';
         });
     } else if (state.view === 'stats') {
         calcStreak(); h += '<div class="space-y-4">';
-        h += '<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4"><h3 class="font-bold mb-3"><span class="material-symbols-outlined mr-2" style="vertical-align:middle;">show_chart</span>7 derniers jours</h3>';
+        h += '<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4"><h3 class="font-bold mb-3"><span class="material-icons mr-2" style="vertical-align:middle;">show_chart</span>7 derniers jours</h3>';
         h += '<div class="chart-container"><canvas id="statsChart"></canvas></div></div>';
-        h += '<button onclick="generateShareImage()" class="w-full py-3 text-white font-bold rounded-lg flex items-center justify-center gap-2" style="transition:all 0.2s;background:linear-gradient(135deg, #0d47a1 0%, #1976d2 100%);"><span class="material-symbols-outlined">share</span>Partager ma progression</button>';
-        h += '<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4"><h3 class="font-bold mb-3"><span class="material-symbols-outlined mr-2" style="vertical-align:middle;">trending_up</span>Résumé</h3><div class="grid grid-cols-2 gap-3">';
+        h += '<button onclick="generateShareImage()" class="w-full py-3 text-white font-bold rounded-lg flex items-center justify-center gap-2" style="transition:all 0.2s;background:linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);"><span class="material-icons">share</span>Partager ma progression</button>';
+        h += '<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4"><h3 class="font-bold mb-3"><span class="material-icons mr-2" style="vertical-align:middle;">trending_up</span>Résumé</h3><div class="grid grid-cols-2 gap-3">';
         h += '<div class="text-center p-3 bg-zinc-950 rounded-lg"><div class="text-4xl font-bold">' + state.history.length + 
             '</div><div class="text-xs text-zinc-500">Jours enregistrés</div></div>';
         h += '<div class="text-center p-3 bg-blue-950 rounded-lg border border-blue-900"><div class="text-4xl font-bold text-blue-400">' + state.streak + 
@@ -598,34 +710,42 @@ function render() {
         })));
         const hours = Math.floor(totalMinutes / 60), minutes = totalMinutes % 60;
         h += '<div class="bg-gradient-to-br from-purple-950 to-purple-900 border border-purple-800 rounded-lg p-4 text-center">';
-        h += '<span class="material-symbols-outlined text-purple-300" style="font-size:48px;">timer</span><div class="text-3xl font-bold text-purple-200 mt-2">' + hours + 'h ' + minutes + 'min</div>';
+        h += '<span class="material-icons text-purple-300" style="font-size:48px;">timer</span><div class="text-3xl font-bold text-purple-200 mt-2">' + hours + 'h ' + minutes + 'min</div>';
         h += '<div class="text-sm text-purple-300 mt-1">Temps total consacré à vos routines</div></div></div>'; renderStatsChart();
     } else if (state.view === 'manage') {
+        const totalTasks = getTotalTaskCount();
+        h += '<div class="bg-gradient-to-br from-blue-950 to-blue-900 border border-blue-800 rounded-lg p-4 mb-4 text-center">';
+        h += '<p class="text-sm text-blue-200 mb-2"><span class="material-icons" style="vertical-align:middle;font-size:20px;">info</span> <strong>Capacité utilisée</strong></p>';
+        h += '<div class="flex justify-around items-center">';
+        h += '<div><div class="text-3xl font-bold text-blue-300">' + state.routines.length + ' / ' + MAX_ROUTINES + '</div><div class="text-xs text-blue-300">Routines</div></div>';
+        h += '<div><div class="text-3xl font-bold text-blue-300">' + totalTasks + ' / ' + MAX_TASKS + '</div><div class="text-xs text-blue-300">Tâches</div></div>';
+        h += '</div></div>';
+        h += '<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4 mb-4 text-center"><p class="text-zinc-400 italic">C\'est sur cette page que vous définissez vos routines et les tâches qu\'elles contiennent.</p></div>';
         h += '<div class="space-y-4">'; state.routines.forEach(routine => {
             h += '<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4"><div class="flex items-center justify-between mb-3">';
-            h += '<div class="flex items-center gap-2"><span class="material-symbols-outlined text-2xl" style="color:#3B82F6;">' + routine.icon + '</span><h3 class="font-bold">' + routine.name + '</h3></div>';
-            h += '<div class="flex gap-2"><button onclick="openEditRoutine(\'' + routine.id + '\')" class="p-2 text-blue-400 hover:bg-blue-950 rounded"><span class="material-symbols-outlined">edit</span></button>';
-            h += '<button onclick="deleteRoutine(\'' + routine.id + '\')" class="p-2 text-red-400 hover:bg-red-950 rounded"><span class="material-symbols-outlined">delete</span></button></div></div>';
+            h += '<div class="flex items-center gap-2"><span class="material-icons text-2xl" style="color:#3B82F6;">' + routine.icon + '</span><h3 class="font-bold">' + routine.name + '</h3></div>';
+            h += '<div class="flex gap-2"><button onclick="openEditRoutine(\'' + routine.id + '\')" class="p-2 text-blue-400 hover:bg-blue-950 rounded"><span class="material-icons">edit</span></button>';
+            h += '<button onclick="deleteRoutine(\'' + routine.id + '\')" class="p-2 text-red-400 hover:bg-red-950 rounded"><span class="material-icons">delete</span></button></div></div>';
             h += '<div class="space-y-2" id="manage-tasks-' + routine.id + '">';
             routine.tasks.forEach(task => {
                 h += '<div class="flex items-center justify-between p-2 bg-zinc-950 rounded" data-task-id="' + task.id + '">';
-                h += '<span class="material-symbols-outlined text-zinc-600 task-handle" style="cursor:move;font-size:20px;margin-right:8px;">drag_indicator</span>';
-                h += '<div class="flex items-center gap-2 flex-1"><span class="material-symbols-outlined">' + task.icon + '</span><span class="task-name-sofia">' + task.name + ' (' + task.duration + ' min)</span></div>';
-                h += '<div class="flex gap-2"><button onclick="openEditTask(\'' + routine.id + '\',\'' + task.id + '\')" class="text-blue-400 hover:bg-blue-950 rounded p-1"><span class="material-symbols-outlined">edit</span></button>';
-                h += '<button onclick="deleteTask(\'' + routine.id + '\',\'' + task.id + '\')" class="text-red-400 hover:bg-red-950 rounded p-1"><span class="material-symbols-outlined">delete</span></button></div></div>';
+                h += '<span class="material-icons text-zinc-600 task-handle" style="cursor:move;font-size:20px;margin-right:8px;">drag_indicator</span>';
+                h += '<div class="flex items-center gap-2 flex-1"><span class="material-icons">' + task.icon + '</span><span class="task-name-sofia">' + task.name + ' (' + task.duration + ' min)</span></div>';
+                h += '<div class="flex gap-2"><button onclick="openEditTask(\'' + routine.id + '\',\'' + task.id + '\')" class="text-blue-400 hover:bg-blue-950 rounded p-1"><span class="material-icons">edit</span></button>';
+                h += '<button onclick="deleteTask(\'' + routine.id + '\',\'' + task.id + '\')" class="text-red-400 hover:bg-red-950 rounded p-1"><span class="material-icons">delete</span></button></div></div>';
             });
             h += '</div><button onclick="openAddTask(\'' + routine.id + '\')" class="w-full mt-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">';
-            h += '<span class="material-symbols-outlined mr-2" style="vertical-align:middle;font-size:18px;">add</span>Ajouter une tâche</button></div>';
+            h += '<span class="material-icons mr-2" style="vertical-align:middle;font-size:18px;">add</span>Ajouter une tâche</button></div>';
         });
-        h += '<button onclick="addNewRoutine()" class="w-full py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700"><span class="material-symbols-outlined mr-2" style="vertical-align:middle;">add</span>Nouvelle Routine</button></div>';
+        h += '<button onclick="addNewRoutine()" class="w-full py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700"><span class="material-icons mr-2" style="vertical-align:middle;">add</span>Nouvelle Routine</button></div>';
     } else if (state.view === 'calendar') {
         h += renderCal(); h += '<div style="margin-top:20px;"></div>'; h += renderHistoryList();
     } else if (state.view === 'goals') {
         calcStreak(); h += '<div class="space-y-4">';
-        h += '<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4"><h3 class="font-bold mb-3"><span class="material-symbols-outlined mr-2" style="vertical-align:middle;">local_fire_department</span>Série actuelle</h3>';
+        h += '<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4"><h3 class="font-bold mb-3"><span class="material-icons mr-2" style="vertical-align:middle;">local_fire_department</span>Série actuelle</h3>';
         h += '<div class="text-center"><div class="text-6xl font-bold text-orange-500 mb-2 streak-pulse">' + state.streak + 
             '</div><div class="text-zinc-400">jour' + (state.streak>1?'s':'') + ' à >75%</div></div></div>';
-        h += '<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4"><h3 class="font-bold mb-3"><span class="material-symbols-outlined mr-2" style="vertical-align:middle;">emoji_events</span>Achievements (' + 
+        h += '<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4"><h3 class="font-bold mb-3"><span class="material-icons mr-2" style="vertical-align:middle;">emoji_events</span>Achievements (' + 
             state.unlockedBadges.length + '/' + BADGES.length + ')</h3><div class="badge-container">';
         BADGES.forEach(badge => {
             const unlocked = state.unlockedBadges.includes(badge.id);
@@ -633,7 +753,7 @@ function render() {
             h += '<div class="badge-icon">' + badge.icon + '</div><div class="badge-name">' + badge.name + '</div></div>';
         });
         h += '</div></div><div class="bg-blue-950 border border-blue-900 rounded-lg p-4 text-sm text-blue-200">';
-        h += '<span class="material-symbols-outlined mr-2" style="vertical-align:middle;">stars</span><strong>Objectif :</strong> Compléter au moins 75% de vos tâches chaque jour pour maintenir votre série !</div></div>';
+        h += '<span class="material-icons mr-2" style="vertical-align:middle;">stars</span><strong>Objectif :</strong> Compléter au moins 75% de vos tâches chaque jour pour maintenir votre série !</div></div>';
     }
     h += '</div><div style="margin-top:40px;padding-bottom:40px;text-align:center;">';
     h += '<p style="margin-top:30px;color:#555;font-size:14px;line-height:1.8;">App v' + clientVersion + ' • Mod v' + MODULE_REVISION + ' • Accès anticipé<br>';
@@ -653,50 +773,6 @@ function render() {
                 }});
             }
         });
-    }
-    
-    // Initialiser le swipe pour le calendrier
-    if (state.view === 'calendar') {
-        initCalendarSwipe();
-    }
-}
-
-// Fonction pour initialiser le swipe sur le calendrier
-function initCalendarSwipe() {
-    let touchStartX = 0;
-    let touchEndX = 0;
-    const calendarElement = document.querySelector('.calendar-grid');
-    
-    if (calendarElement) {
-        calendarElement.addEventListener('touchstart', function(e) {
-            touchStartX = e.changedTouches[0].screenX;
-        });
-
-        calendarElement.addEventListener('touchend', function(e) {
-            touchEndX = e.changedTouches[0].screenX;
-            handleSwipe();
-        });
-    }
-
-    function handleSwipe() {
-        const swipeThreshold = 50;
-        const swipeDistance = touchEndX - touchStartX;
-        
-        if (Math.abs(swipeDistance) > swipeThreshold) {
-            if (swipeDistance > 0) {
-                // Swipe droite - mois précédent
-                state.calendarDate.setMonth(state.calendarDate.getMonth() - 1);
-                render();
-            } else {
-                // Swipe gauche - mois suivant (seulement si pas dans le futur)
-                const today = new Date();
-                const current = new Date(state.calendarDate);
-                if (current.getMonth() < today.getMonth() || current.getFullYear() < today.getFullYear()) {
-                    state.calendarDate.setMonth(state.calendarDate.getMonth() + 1);
-                    render();
-                }
-            }
-        }
     }
 }
 
@@ -732,3 +808,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Erreur:', e); document.getElementById('app').innerHTML = '<div style="color:red;padding:20px;">Erreur: ' + e.message + '</div>';
     }
 });
+
+// ========================================
+// FIN DU SCRIPT v0.11.5-beta
+// ========================================
