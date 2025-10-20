@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Routines - SanteMentale.org</title>
+    <title>Routines - SanteMentale.org | Mod v.0.11.4</title>
     <link rel="icon" type="image/x-icon" href="https://santementale.org/favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
@@ -60,7 +60,7 @@
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-3px); }
         }
-        .material-icons.routine-icon-animated { animation: float-drift 5s ease-in-out infinite; }
+        .material-symbols-outlined.routine-icon-animated { animation: float-drift 5s ease-in-out infinite; }
         .badge-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -147,7 +147,7 @@
             font-weight: 700;
             color: #fff;
             text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-            z-index: 10;
+            z-index: 2;
         }
         .achievement-notification {
             position: fixed;
@@ -358,6 +358,16 @@
             background: #27272a;
             transform: translateX(4px);
         }
+        .calendar-day.has-data {
+            cursor: pointer;
+        }
+        .calendar-day.has-data:hover {
+            transform: scale(1.1);
+        }
+        .month-nav-disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
         /* NOUVEAU v0.11 - Canvas caché pour partage */
         #shareCanvas {
             display: none;
@@ -415,16 +425,16 @@
     
     <!-- NOUVEAU v0.11 - Popup détails jour historique -->
     <div id="dayDetailPopup" class="popup">
-        <div class="popup-content" style="text-align:left;">
-            <h3 id="dayDetailTitle" style="font-weight:bold;margin-bottom:15px;text-align:center;"></h3>
+        <div class="popup-content" style="text-align:left; position: relative;">
+            <button onclick="closePopup('dayDetailPopup')" style="position: absolute; top: 10px; right: 10px; background: none; border: none; cursor: pointer; font-size: 24px; color: #000; width: auto; padding: 0; margin: 0;">✕</button>
+            <h3 id="dayDetailTitle" style="font-weight:bold;margin-bottom:15px;text-align:center;margin-top:10px;"></h3>
             <div id="dayDetailContent"></div>
-            <button class="close-btn" onclick="closePopup('dayDetailPopup')" style="width:100%;margin-top:15px;">Fermer</button>
         </div>
     </div>
     
     <div id="achievementNotification" class="achievement-notification">
         <div style="display:flex;align-items:center;gap:12px;">
-            <span class="material-icons" style="font-size:40px;">emoji_events</span>
+            <span class="material-symbols-outlined" style="font-size:40px;">emoji_events</span>
             <div>
                 <div style="font-weight:bold;font-size:16px;">Achievement débloqué !</div>
                 <div id="achievementText" style="font-size:14px;margin-top:4px;"></div>

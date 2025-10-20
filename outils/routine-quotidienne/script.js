@@ -1,10 +1,10 @@
 // ========================================
-// ROUTINES v0.11 - Script FINAL COMPLET
+// ROUTINES v0.11.4 - Script FINAL COMPLET
 // ========================================
 
 const MODULE_REVISION = '0.11';
-const ICONS = ['wb_sunny', 'nightlight', 'favorite', 'local_cafe', 'book', 'fitness_center', 'water_drop', 'music_note', 'brush', 'phone', 'email', 'shopping_cart', 'nature', 'laptop', 'sports_esports', 'camera_alt', 'edit', 'palette', 'home', 'work', 'restaurant', 'bed', 'self_improvement', 'spa', 'pets', 'alarm', 'directions_run', 'school', 'local_dining', 'psychology'];
-const TASK_ICONS = ['self_improvement', 'spa', 'favorite_border', 'local_cafe', 'restaurant', 'water_drop', 'fitness_center', 'directions_run', 'bedtime', 'alarm', 'book', 'edit', 'music_note', 'brush', 'palette', 'shower', 'clean_hands', 'medication', 'healing', 'psychology', 'wb_sunny', 'nightlight', 'nature', 'park', 'pets', 'phone', 'people', 'home', 'work', 'school'];
+const ICONS = ['sunny', 'clear_night', 'favorite', 'coffee', 'menu_book', 'fitness_center', 'water_drop', 'music_note', 'brush', 'phone', 'email', 'shopping_cart', 'nature', 'computer', 'sports_esports', 'photo_camera', 'edit', 'palette', 'home', 'work', 'restaurant', 'bed', 'self_improvement', 'spa', 'pets', 'alarm', 'directions_run', 'school', 'dining', 'psychology'];
+const TASK_ICONS = ['self_improvement', 'spa', 'favorite', 'coffee', 'restaurant', 'water_drop', 'fitness_center', 'directions_run', 'bed', 'alarm', 'menu_book', 'edit', 'music_note', 'brush', 'palette', 'shower', 'clean_hands', 'medication', 'healing', 'psychology', 'sunny', 'clear_night', 'nature', 'park', 'pets', 'phone', 'group', 'home', 'work', 'school'];
 const BADGES = [
     { id: 'first_step', name: 'Premier Pas', icon: '🎯', description: 'Compléter votre première tâche', requirement: 'tasks', threshold: 1 },
     { id: 'dedicated', name: 'Dévoué', icon: '💪', description: 'Compléter 50 tâches', requirement: 'tasks', threshold: 50 },
@@ -35,30 +35,30 @@ const WHATS_NEW = [
 let state = {
     routines: [], history: [], view: 'today', currentDate: new Date().toLocaleDateString('fr-FR'),
     editingRoutineId: null, addingTaskToRoutine: null, editingTaskRoutineId: null, editingTaskId: null,
-    selectedRoutineIcon: 'wb_sunny', selectedTaskIcon: 'self_improvement', selectedEditTaskIcon: 'self_improvement',
+    selectedRoutineIcon: 'sunny', selectedTaskIcon: 'self_improvement', selectedEditTaskIcon: 'self_improvement',
     calendarDate: new Date(), streak: 0, xp: 0, level: 1, unlockedBadges: [], totalTasksCompleted: 0,
     perfectDaysCount: 0, statsChart: null, tutorialStep: -1, lastSeenVersion: '0', isFirstTimeView: false
 };
 
 function initDefaultRoutines() {
     return [
-        { id: 'morning', name: 'Routine Matin', icon: 'wb_sunny', tasks: [
-            { id: 't1', name: 'Se réveiller', icon: 'bedtime', duration: 0, completed: false },
+        { id: 'morning', name: 'Routine Matin', icon: 'sunny', tasks: [
+            { id: 't1', name: 'Se réveiller', icon: 'bed', duration: 0, completed: false },
             { id: 't2', name: 'Boire un verre d\'eau', icon: 'water_drop', duration: 2, completed: false },
-            { id: 't3', name: 'Petit déjeuner', icon: 'local_cafe', duration: 20, completed: false },
+            { id: 't3', name: 'Petit déjeuner', icon: 'coffee', duration: 20, completed: false },
             { id: 't4', name: 'Hygiène', icon: 'shower', duration: 15, completed: false }
         ]},
-        { id: 'day', name: 'Routine Journée', icon: 'laptop', tasks: [
+        { id: 'day', name: 'Routine Journée', icon: 'computer', tasks: [
             { id: 't5', name: 'Planifier la journée', icon: 'edit', duration: 10, completed: false },
-            { id: 't6', name: 'Travail/Études', icon: 'laptop', duration: 240, completed: false },
+            { id: 't6', name: 'Travail/Études', icon: 'computer', duration: 240, completed: false },
             { id: 't7', name: 'Pause déjeuner', icon: 'restaurant', duration: 45, completed: false },
             { id: 't8', name: 'Activité physique', icon: 'fitness_center', duration: 30, completed: false }
         ]},
-        { id: 'evening', name: 'Routine Soir', icon: 'nightlight', tasks: [
+        { id: 'evening', name: 'Routine Soir', icon: 'clear_night', tasks: [
             { id: 't9', name: 'Dîner', icon: 'restaurant', duration: 30, completed: false },
-            { id: 't10', name: 'Moment détente', icon: 'book', duration: 60, completed: false },
+            { id: 't10', name: 'Moment détente', icon: 'menu_book', duration: 60, completed: false },
             { id: 't11', name: 'Préparer le lendemain', icon: 'edit', duration: 15, completed: false },
-            { id: 't12', name: 'Coucher', icon: 'bedtime', duration: 0, completed: false }
+            { id: 't12', name: 'Coucher', icon: 'bed', duration: 0, completed: false }
         ]}
     ];
 }
@@ -215,17 +215,21 @@ const username = localStorage.getItem('username') || localStorage.getItem('devic
 
 function showDayDetail(dateStr) {
     const dayData = state.history.find(h => h.date === dateStr); if (!dayData) return;
+    
+    // Scroll vers le haut
+    document.getElementById('dayDetailContent').scrollTop = 0;
+    
     document.getElementById('dayDetailTitle').textContent = 'Détails du ' + dateStr;
 
     let html = '', totalTasks = 0, completedTasks = 0;
     state.routines.forEach(routine => {
         const routineData = dayData.routines[routine.id]; if (!routineData) return;
         html += '<div style="margin-bottom:20px;"><h4 style="font-weight:bold;margin-bottom:10px;display:flex;align-items:center;gap:8px;">';
-        html += '<span class="material-icons" style="color:#3B82F6;">' + routine.icon + '</span>' + routine.name + '</h4><div style="margin-left:32px;">';
+        html += '<span class="material-symbols-outlined" style="color:#3B82F6;">' + routine.icon + '</span>' + routine.name + '</h4><div style="margin-left:32px;">';
         routine.tasks.forEach(task => {
             totalTasks++; const completed = routineData[task.id]; if (completed) completedTasks++;
             html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:8px;background:' + 
-                (completed ? '#dcfce7' : '#fee2e2') + ';border-radius:6px;"><span class="material-icons" style="font-size:20px;color:' + 
+                (completed ? '#dcfce7' : '#fee2e2') + ';border-radius:6px;"><span class="material-symbols-outlined" style="font-size:20px;color:' + 
                 (completed ? '#10B981' : '#EF4444') + ';">' + (completed ? 'check_circle' : 'cancel') + '</span>' +
                 '<span style="color:#000;">' + task.name + '</span></div>';
         });
@@ -245,7 +249,7 @@ function renderHistoryList() {
     });
 
     let html = '<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4">';
-    html += '<h3 class="font-bold mb-3"><span class="material-icons mr-2" style="vertical-align:middle;">history</span>Historique complet</h3>';
+    html += '<h3 class="font-bold mb-3"><span class="material-symbols-outlined mr-2" style="vertical-align:middle;">history</span>Historique complet</h3>';
     if (sortedHistory.length === 0) {
         html += '<p class="text-zinc-500 text-center py-8">Aucun historique disponible</p>';
     } else {
@@ -351,7 +355,7 @@ function saveRoutineEdit() {
 function renderIconPicker() {
     document.getElementById('iconPicker').innerHTML = ICONS.map(icon =>
         '<div class="icon-option ' + (state.selectedRoutineIcon === icon ? 'selected' : '') + '" onclick="state.selectedRoutineIcon=\'' + icon + '\';renderIconPicker();">' +
-        '<span class="material-icons" style="font-size:24px;color:black;">' + icon + '</span></div>'
+        '<span class="material-symbols-outlined" style="font-size:24px;color:black;">' + icon + '</span></div>'
     ).join('');
 }
 
@@ -361,7 +365,7 @@ function openAddTask(routineId) { state.addingTaskToRoutine = routineId; state.s
 function renderTaskIconPicker() {
     document.getElementById('taskIconPicker').innerHTML = TASK_ICONS.map(icon =>
         '<div class="icon-option ' + (state.selectedTaskIcon === icon ? 'selected' : '') + '" onclick="state.selectedTaskIcon=\'' + icon + '\';renderTaskIconPicker();">' +
-        '<span class="material-icons" style="font-size:24px;color:black;">' + icon + '</span></div>'
+        '<span class="material-symbols-outlined" style="font-size:24px;color:black;">' + icon + '</span></div>'
     ).join('');
 }
 
@@ -381,7 +385,7 @@ function openEditTask(routineId, taskId) { state.editingTaskRoutineId = routineI
 function renderEditTaskIconPicker() {
     document.getElementById('editTaskIconPicker').innerHTML = TASK_ICONS.map(icon =>
         '<div class="icon-option ' + (state.selectedEditTaskIcon === icon ? 'selected' : '') + '" onclick="state.selectedEditTaskIcon=\'' + icon + '\';renderEditTaskIconPicker();">' +
-        '<span class="material-icons" style="font-size:24px;color:black;">' + icon + '</span></div>'
+        '<span class="material-symbols-outlined" style="font-size:24px;color:black;">' + icon + '</span></div>'
     ).join('');
 }
 
@@ -403,7 +407,7 @@ function deleteRoutine(routineId) { if (!confirm('Supprimer cette routine compl�
 
 function addNewRoutine() {
     const name = prompt('Nom de la nouvelle routine:'); if (!name) return;
-    const newRoutine = { id: 'r' + Date.now(), name: name, icon: 'wb_sunny', tasks: [] };
+    const newRoutine = { id: 'r' + Date.now(), name: name, icon: 'sunny', tasks: [] };
     state.routines.push(newRoutine); localStorage.setItem('routines', JSON.stringify(state.routines)); checkBadges(); render();
 }
 
@@ -434,14 +438,24 @@ function calcStreak() {
 
 function renderCal() {
     const y = state.calendarDate.getFullYear(), m = state.calendarDate.getMonth();
+    const today = new Date();
+    const isCurrentMonth = y === today.getFullYear() && m === today.getMonth();
     const first = new Date(y, m, 1), last = new Date(y, m + 1, 0); const days = last.getDate(), start = first.getDay();
     let h = '<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4">';
     h += '<div class="flex items-center justify-between mb-4">';
-    h += '<button onclick="state.calendarDate.setMonth(state.calendarDate.getMonth()-1);render();" class="text-blue-400"><span class="material-icons">chevron_left</span></button>';
+    h += '<button onclick="state.calendarDate.setMonth(state.calendarDate.getMonth()-1);render();" class="text-blue-400"><span class="material-symbols-outlined">chevron_left</span></button>';
     h += '<h3 class="font-bold">' + first.toLocaleDateString('fr-FR', {month:'long',year:'numeric'}) + '</h3>';
-    h += '<button onclick="state.calendarDate.setMonth(state.calendarDate.getMonth()+1);render();" class="text-blue-400"><span class="material-icons">chevron_right</span></button>';
+    
+    // Bouton suivant conditionnel
+    if (isCurrentMonth) {
+        h += '<button class="text-blue-400 month-nav-disabled"><span class="material-symbols-outlined">chevron_right</span></button>';
+    } else {
+        h += '<button onclick="state.calendarDate.setMonth(state.calendarDate.getMonth()+1);render();" class="text-blue-400"><span class="material-symbols-outlined">chevron_right</span></button>';
+    }
+    
     h += '</div><div class="grid grid-cols-7 gap-1 text-center text-xs mb-2 text-zinc-500"><div>D</div><div>L</div><div>M</div><div>M</div><div>J</div><div>V</div><div>S</div></div>';
-    h += '<div class="grid grid-cols-7 gap-1">';
+    h += '<div class="grid grid-cols-7 gap-1 calendar-grid">';
+    
     for (let i = 0; i < start; i++) h += '<div></div>';
     for (let d = 1; d <= days; d++) {
         const dt = new Date(y, m, d), ds = dt.toLocaleDateString('fr-FR'); const dayData = state.history.find(h => h.date === ds);
@@ -451,15 +465,27 @@ function renderCal() {
             })); completion = total > 0 ? completed / total : 0;
         }
         let bg = '#18181b', txt = '#a1a1aa';
-        if (completion > 0) { if (completion >= 0.76) { bg = '#10B981'; txt = '#fff'; }
+        if (completion > 0) { 
+            if (completion >= 0.76) { bg = '#10B981'; txt = '#fff'; }
             else if (completion >= 0.51) { bg = '#F59E0B'; txt = '#fff'; }
-            else if (completion >= 0.26) { bg = '#EF4444'; txt = '#fff'; } else { bg = '#3B82F6'; txt = '#fff'; }
+            else if (completion >= 0.26) { bg = '#EF4444'; txt = '#fff'; } 
+            else { bg = '#3B82F6'; txt = '#fff'; }
         }
-        h += '<div class="calendar-day" style="background-color:' + bg + ';color:' + txt + ';" title="' + Math.round(completion*100) + '%">' + d + '</div>';
+        const isToday = ds === state.currentDate;
+        
+        // Rendre les jours avec données cliquables
+        if (completion > 0) {
+            h += '<div class="calendar-day has-data" style="background-color:' + bg + ';color:' + txt + ';' + (isToday ? 'border:2px solid #3B82F6;' : '') + '" title="' + Math.round(completion*100) + '%" onclick="showDayDetail(\'' + ds + '\')">' + d + '</div>';
+        } else {
+            h += '<div class="calendar-day" style="background-color:' + bg + ';color:' + txt + ';' + (isToday ? 'border:2px solid #3B82F6;' : '') + '" title="' + Math.round(completion*100) + '%">' + d + '</div>';
+        }
     }
+    
     h += '</div><div class="mt-3 text-xs text-zinc-500 flex gap-2"><div><span class="inline-block w-3 h-3 rounded" style="background:#3B82F6"></span> 0-25%</div>';
     h += '<div><span class="inline-block w-3 h-3 rounded" style="background:#EF4444"></span> 26-50%</div><div><span class="inline-block w-3 h-3 rounded" style="background:#F59E0B"></span> 51-75%</div>';
-    h += '<div><span class="inline-block w-3 h-3 rounded" style="background:#10B981"></span> 76-100%</div></div></div>'; return h;
+    h += '<div><span class="inline-block w-3 h-3 rounded" style="background:#10B981"></span> 76-100%</div></div></div>'; 
+    
+    return h;
 }
 
 function showBadgeDetail(badgeId) {
@@ -514,19 +540,22 @@ function renderStatsChart() {
 function render() {
     const app = document.getElementById('app'); const clientVersion = localStorage.getItem('client_version') || '1.web';
     let h = '<div class="bg-zinc-900 border-b border-zinc-800 sticky top-0 z-10"><div class="max-w-2xl mx-auto px-4 py-4 flex items-center gap-3">';
-    h += '<a href="/v1/outils/?v=' + clientVersion + '" class="back-btn" style="flex-shrink:0;"><span class="material-icons">arrow_back</span></a>';
-    h += '<h1 class="text-3xl font-bold title-genos">Routines <button onclick="openPopup(\'helpModalPopup\')" style="background:none;border:none;cursor:pointer;color:#3B82F6;padding:0;margin-left:4px;vertical-align:baseline;"><span class="material-icons" style="font-size:20px;">info</span></button></h1>';
+    h += '<a href="/v1/outils/?v=' + clientVersion + '" class="back-btn" style="flex-shrink:0;"><span class="material-symbols-outlined">arrow_back</span></a>';
+    h += '<h1 class="text-3xl font-bold title-genos">Routines <button onclick="openPopup(\'helpModalPopup\')" style="background:none;border:none;cursor:pointer;color:#3B82F6;padding:0;margin-left:4px;vertical-align:baseline;"><span class="material-symbols-outlined" style="font-size:20px;">info</span></button></h1>';
     h += '<div style="margin-left:auto;"><span class="material-symbols-outlined title-icon-animated" style="color:#3B82F6;font-size:32px;">routine</span></div></div></div>';
     h += '<div class="bg-zinc-900 border-b border-zinc-800"><div class="max-w-2xl mx-auto px-4"><div class="flex gap-1 justify-around">';
-    h += '<button onclick="state.view=\'today\';render();" class="py-4 px-3 transition-all ' + (state.view==='today'?'text-blue-400 border-b-2 border-blue-500':'text-zinc-500') + '"><span class="material-icons" style="font-size:24px;">check_box</span></button>';
-    h += '<button onclick="state.view=\'stats\';render();" class="py-4 px-3 transition-all ' + (state.view==='stats'?'text-blue-400 border-b-2 border-blue-500':'text-zinc-500') + '"><span class="material-icons" style="font-size:24px;">bar_chart</span></button>';
-    h += '<button onclick="state.view=\'manage\';render();" class="py-4 px-3 transition-all ' + (state.view==='manage'?'text-blue-400 border-b-2 border-blue-500':'text-zinc-500') + '"><span class="material-icons" style="font-size:24px;">settings</span></button>';
-    h += '<button onclick="state.view=\'calendar\';render();" class="py-4 px-3 transition-all ' + (state.view==='calendar'?'text-blue-400 border-b-2 border-blue-500':'text-zinc-500') + '"><span class="material-icons" style="font-size:24px;">calendar_month</span></button>';
-    h += '<button onclick="state.view=\'goals\';render();" class="py-4 px-3 transition-all ' + (state.view==='goals'?'text-blue-400 border-b-2 border-blue-500':'text-zinc-500') + '"><span class="material-icons" style="font-size:24px;">emoji_events</span></button>';
+    
+    // Réorganisation des onglets : today, stats, calendar, goals, manage (paramètres en dernier)
+    h += '<button onclick="state.view=\'today\';render();" class="py-4 px-3 transition-all ' + (state.view==='today'?'text-blue-400 border-b-2 border-blue-500':'text-zinc-500') + '"><span class="material-symbols-outlined" style="font-size:24px;">check_box</span></button>';
+    h += '<button onclick="state.view=\'stats\';render();" class="py-4 px-3 transition-all ' + (state.view==='stats'?'text-blue-400 border-b-2 border-blue-500':'text-zinc-500') + '"><span class="material-symbols-outlined" style="font-size:24px;">bar_chart</span></button>';
+    h += '<button onclick="state.view=\'calendar\';render();" class="py-4 px-3 transition-all ' + (state.view==='calendar'?'text-blue-400 border-b-2 border-blue-500':'text-zinc-500') + '"><span class="material-symbols-outlined" style="font-size:24px;">calendar_month</span></button>';
+    h += '<button onclick="state.view=\'goals\';render();" class="py-4 px-3 transition-all ' + (state.view==='goals'?'text-blue-400 border-b-2 border-blue-500':'text-zinc-500') + '"><span class="material-symbols-outlined" style="font-size:24px;">emoji_events</span></button>';
+    h += '<button onclick="state.view=\'manage\';render();" class="py-4 px-3 transition-all ' + (state.view==='manage'?'text-blue-400 border-b-2 border-blue-500':'text-zinc-500') + '"><span class="material-symbols-outlined" style="font-size:24px;">settings</span></button>';
+    
     h += '</div></div></div><div class="max-w-2xl mx-auto px-4 py-6">';
     const xpInLevel = state.xp % XP_PER_LEVEL; const xpPercent = (xpInLevel / XP_PER_LEVEL) * 100;
     h += '<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4 mb-4">';
-    h += '<div class="flex items-center justify-between mb-2" style="position:relative;z-index:1;"><div class="flex items-center gap-2"><span class="material-icons text-yellow-400" style="font-size:28px;">star</span><span class="font-bold text-lg">Niveau ' + state.level + '</span></div>';
+    h += '<div class="flex items-center justify-between mb-2" style="position:relative;z-index:1;"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-yellow-400" style="font-size:28px;">star</span><span class="font-bold text-lg">Niveau ' + state.level + '</span></div>';
     h += '<span class="text-sm text-zinc-400">' + xpInLevel + ' / ' + XP_PER_LEVEL + ' XP</span></div><div class="xp-bar"><div class="xp-fill" style="width:' + xpPercent + '%"></div><div class="xp-text">' + Math.round(xpPercent) + '%</div></div></div>';
 
     if (state.view === 'today') {
@@ -537,14 +566,14 @@ function render() {
         state.routines.forEach(routine => {
             const rc = getRoutineCompletion(routine.id);
             h += '<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4 mb-4"><div class="flex items-center justify-between mb-3">';
-            h += '<div class="flex items-center gap-2"><span class="material-icons text-2xl routine-icon-animated" style="color:#3B82F6;">' + routine.icon + 
+            h += '<div class="flex items-center gap-2"><span class="material-symbols-outlined text-2xl routine-icon-animated" style="color:#3B82F6;">' + routine.icon + 
                 '</span><h3 class="font-bold">' + routine.name + '</h3></div><span class="text-sm text-zinc-500">' + rc + '%</span></div>';
             h += '<div class="space-y-2" id="tasks-' + routine.id + '">';
             routine.tasks.forEach(task => {
                 h += '<div class="flex items-center gap-3 p-3 bg-zinc-950 rounded-lg border border-zinc-800" data-task-id="' + task.id + '" data-routine-id="' + routine.id + '">';
                 h += '<label class="flex items-center cursor-pointer" style="user-select:none;"><input type="checkbox" ' + (task.completed ? 'checked' : '') + 
                     ' class="w-5 h-5 checkbox-task" data-routine="' + routine.id + '" data-task="' + task.id + '"></label>';
-                h += '<span class="material-icons text-xl">' + task.icon + '</span><div class="flex-1"><div class="font-semibold ' + 
+                h += '<span class="material-symbols-outlined text-xl">' + task.icon + '</span><div class="flex-1"><div class="font-semibold ' + 
                     (task.completed ? 'line-through text-zinc-500' : '') + '">' + task.name + '</div>';
                 h += '<div class="text-xs text-zinc-600">' + task.duration + '&nbsp;min&nbsp;&nbsp;&nbsp;+' + XP_PER_TASK + '&nbsp;XP</div></div></div>';
             });
@@ -552,10 +581,10 @@ function render() {
         });
     } else if (state.view === 'stats') {
         calcStreak(); h += '<div class="space-y-4">';
-        h += '<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4"><h3 class="font-bold mb-3"><span class="material-icons mr-2" style="vertical-align:middle;">show_chart</span>7 derniers jours</h3>';
+        h += '<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4"><h3 class="font-bold mb-3"><span class="material-symbols-outlined mr-2" style="vertical-align:middle;">show_chart</span>7 derniers jours</h3>';
         h += '<div class="chart-container"><canvas id="statsChart"></canvas></div></div>';
-        h += '<button onclick="generateShareImage()" class="w-full py-3 text-white font-bold rounded-lg flex items-center justify-center gap-2" style="transition:all 0.2s;background:linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);"><span class="material-icons">share</span>Partager ma progression</button>';
-        h += '<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4"><h3 class="font-bold mb-3"><span class="material-icons mr-2" style="vertical-align:middle;">trending_up</span>Résumé</h3><div class="grid grid-cols-2 gap-3">';
+        h += '<button onclick="generateShareImage()" class="w-full py-3 text-white font-bold rounded-lg flex items-center justify-center gap-2" style="transition:all 0.2s;background:linear-gradient(135deg, #0d47a1 0%, #1976d2 100%);"><span class="material-symbols-outlined">share</span>Partager ma progression</button>';
+        h += '<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4"><h3 class="font-bold mb-3"><span class="material-symbols-outlined mr-2" style="vertical-align:middle;">trending_up</span>Résumé</h3><div class="grid grid-cols-2 gap-3">';
         h += '<div class="text-center p-3 bg-zinc-950 rounded-lg"><div class="text-4xl font-bold">' + state.history.length + 
             '</div><div class="text-xs text-zinc-500">Jours enregistrés</div></div>';
         h += '<div class="text-center p-3 bg-blue-950 rounded-lg border border-blue-900"><div class="text-4xl font-bold text-blue-400">' + state.streak + 
@@ -569,34 +598,34 @@ function render() {
         })));
         const hours = Math.floor(totalMinutes / 60), minutes = totalMinutes % 60;
         h += '<div class="bg-gradient-to-br from-purple-950 to-purple-900 border border-purple-800 rounded-lg p-4 text-center">';
-        h += '<span class="material-icons text-purple-300" style="font-size:48px;">timer</span><div class="text-3xl font-bold text-purple-200 mt-2">' + hours + 'h ' + minutes + 'min</div>';
+        h += '<span class="material-symbols-outlined text-purple-300" style="font-size:48px;">timer</span><div class="text-3xl font-bold text-purple-200 mt-2">' + hours + 'h ' + minutes + 'min</div>';
         h += '<div class="text-sm text-purple-300 mt-1">Temps total consacré à vos routines</div></div></div>'; renderStatsChart();
     } else if (state.view === 'manage') {
         h += '<div class="space-y-4">'; state.routines.forEach(routine => {
             h += '<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4"><div class="flex items-center justify-between mb-3">';
-            h += '<div class="flex items-center gap-2"><span class="material-icons text-2xl" style="color:#3B82F6;">' + routine.icon + '</span><h3 class="font-bold">' + routine.name + '</h3></div>';
-            h += '<div class="flex gap-2"><button onclick="openEditRoutine(\'' + routine.id + '\')" class="p-2 text-blue-400 hover:bg-blue-950 rounded"><span class="material-icons">edit</span></button>';
-            h += '<button onclick="deleteRoutine(\'' + routine.id + '\')" class="p-2 text-red-400 hover:bg-red-950 rounded"><span class="material-icons">delete</span></button></div></div>';
+            h += '<div class="flex items-center gap-2"><span class="material-symbols-outlined text-2xl" style="color:#3B82F6;">' + routine.icon + '</span><h3 class="font-bold">' + routine.name + '</h3></div>';
+            h += '<div class="flex gap-2"><button onclick="openEditRoutine(\'' + routine.id + '\')" class="p-2 text-blue-400 hover:bg-blue-950 rounded"><span class="material-symbols-outlined">edit</span></button>';
+            h += '<button onclick="deleteRoutine(\'' + routine.id + '\')" class="p-2 text-red-400 hover:bg-red-950 rounded"><span class="material-symbols-outlined">delete</span></button></div></div>';
             h += '<div class="space-y-2" id="manage-tasks-' + routine.id + '">';
             routine.tasks.forEach(task => {
                 h += '<div class="flex items-center justify-between p-2 bg-zinc-950 rounded" data-task-id="' + task.id + '">';
-                h += '<span class="material-icons text-zinc-600 task-handle" style="cursor:move;font-size:20px;margin-right:8px;">drag_indicator</span>';
-                h += '<div class="flex items-center gap-2 flex-1"><span class="material-icons">' + task.icon + '</span><span class="task-name-sofia">' + task.name + ' (' + task.duration + ' min)</span></div>';
-                h += '<div class="flex gap-2"><button onclick="openEditTask(\'' + routine.id + '\',\'' + task.id + '\')" class="text-blue-400 hover:bg-blue-950 rounded p-1"><span class="material-icons">edit</span></button>';
-                h += '<button onclick="deleteTask(\'' + routine.id + '\',\'' + task.id + '\')" class="text-red-400 hover:bg-red-950 rounded p-1"><span class="material-icons">delete</span></button></div></div>';
+                h += '<span class="material-symbols-outlined text-zinc-600 task-handle" style="cursor:move;font-size:20px;margin-right:8px;">drag_indicator</span>';
+                h += '<div class="flex items-center gap-2 flex-1"><span class="material-symbols-outlined">' + task.icon + '</span><span class="task-name-sofia">' + task.name + ' (' + task.duration + ' min)</span></div>';
+                h += '<div class="flex gap-2"><button onclick="openEditTask(\'' + routine.id + '\',\'' + task.id + '\')" class="text-blue-400 hover:bg-blue-950 rounded p-1"><span class="material-symbols-outlined">edit</span></button>';
+                h += '<button onclick="deleteTask(\'' + routine.id + '\',\'' + task.id + '\')" class="text-red-400 hover:bg-red-950 rounded p-1"><span class="material-symbols-outlined">delete</span></button></div></div>';
             });
             h += '</div><button onclick="openAddTask(\'' + routine.id + '\')" class="w-full mt-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">';
-            h += '<span class="material-icons mr-2" style="vertical-align:middle;font-size:18px;">add</span>Ajouter une tâche</button></div>';
+            h += '<span class="material-symbols-outlined mr-2" style="vertical-align:middle;font-size:18px;">add</span>Ajouter une tâche</button></div>';
         });
-        h += '<button onclick="addNewRoutine()" class="w-full py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700"><span class="material-icons mr-2" style="vertical-align:middle;">add</span>Nouvelle Routine</button></div>';
+        h += '<button onclick="addNewRoutine()" class="w-full py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700"><span class="material-symbols-outlined mr-2" style="vertical-align:middle;">add</span>Nouvelle Routine</button></div>';
     } else if (state.view === 'calendar') {
         h += renderCal(); h += '<div style="margin-top:20px;"></div>'; h += renderHistoryList();
     } else if (state.view === 'goals') {
         calcStreak(); h += '<div class="space-y-4">';
-        h += '<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4"><h3 class="font-bold mb-3"><span class="material-icons mr-2" style="vertical-align:middle;">local_fire_department</span>Série actuelle</h3>';
+        h += '<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4"><h3 class="font-bold mb-3"><span class="material-symbols-outlined mr-2" style="vertical-align:middle;">local_fire_department</span>Série actuelle</h3>';
         h += '<div class="text-center"><div class="text-6xl font-bold text-orange-500 mb-2 streak-pulse">' + state.streak + 
             '</div><div class="text-zinc-400">jour' + (state.streak>1?'s':'') + ' à >75%</div></div></div>';
-        h += '<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4"><h3 class="font-bold mb-3"><span class="material-icons mr-2" style="vertical-align:middle;">emoji_events</span>Achievements (' + 
+        h += '<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4"><h3 class="font-bold mb-3"><span class="material-symbols-outlined mr-2" style="vertical-align:middle;">emoji_events</span>Achievements (' + 
             state.unlockedBadges.length + '/' + BADGES.length + ')</h3><div class="badge-container">';
         BADGES.forEach(badge => {
             const unlocked = state.unlockedBadges.includes(badge.id);
@@ -604,7 +633,7 @@ function render() {
             h += '<div class="badge-icon">' + badge.icon + '</div><div class="badge-name">' + badge.name + '</div></div>';
         });
         h += '</div></div><div class="bg-blue-950 border border-blue-900 rounded-lg p-4 text-sm text-blue-200">';
-        h += '<span class="material-icons mr-2" style="vertical-align:middle;">stars</span><strong>Objectif :</strong> Compléter au moins 75% de vos tâches chaque jour pour maintenir votre série !</div></div>';
+        h += '<span class="material-symbols-outlined mr-2" style="vertical-align:middle;">stars</span><strong>Objectif :</strong> Compléter au moins 75% de vos tâches chaque jour pour maintenir votre série !</div></div>';
     }
     h += '</div><div style="margin-top:40px;padding-bottom:40px;text-align:center;">';
     h += '<p style="margin-top:30px;color:#555;font-size:14px;line-height:1.8;">App v' + clientVersion + ' • Mod v' + MODULE_REVISION + ' • Accès anticipé<br>';
@@ -624,6 +653,50 @@ function render() {
                 }});
             }
         });
+    }
+    
+    // Initialiser le swipe pour le calendrier
+    if (state.view === 'calendar') {
+        initCalendarSwipe();
+    }
+}
+
+// Fonction pour initialiser le swipe sur le calendrier
+function initCalendarSwipe() {
+    let touchStartX = 0;
+    let touchEndX = 0;
+    const calendarElement = document.querySelector('.calendar-grid');
+    
+    if (calendarElement) {
+        calendarElement.addEventListener('touchstart', function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        calendarElement.addEventListener('touchend', function(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+    }
+
+    function handleSwipe() {
+        const swipeThreshold = 50;
+        const swipeDistance = touchEndX - touchStartX;
+        
+        if (Math.abs(swipeDistance) > swipeThreshold) {
+            if (swipeDistance > 0) {
+                // Swipe droite - mois précédent
+                state.calendarDate.setMonth(state.calendarDate.getMonth() - 1);
+                render();
+            } else {
+                // Swipe gauche - mois suivant (seulement si pas dans le futur)
+                const today = new Date();
+                const current = new Date(state.calendarDate);
+                if (current.getMonth() < today.getMonth() || current.getFullYear() < today.getFullYear()) {
+                    state.calendarDate.setMonth(state.calendarDate.getMonth() + 1);
+                    render();
+                }
+            }
+        }
     }
 }
 

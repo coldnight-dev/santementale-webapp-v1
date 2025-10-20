@@ -1,0 +1,14 @@
+v0.11.4 - Améliorations de l'interface et corrections de bugs
+
+## Nouvelles fonctionnalités :
+- Navigation par swipe dans le calendrier historique
+- Accès direct à l'historique en cliquant sur les jours du calendrier
+
+## Améliorations interface :
+- Nouvelle icône de fermeture dans les popups d'historique
+- Bouton de partage harmonisé avec le thème bleu
+- Icônes updated en version outlined
+
+## Corrections :
+- Problème d'affichage du pourcentage de progression (z-index)
+- Désactivation de la navigation vers le futur dans le calendrier
