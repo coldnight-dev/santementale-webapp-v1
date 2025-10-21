@@ -349,7 +349,6 @@
         .tutorial-btn.next:hover {
             background: #059669;
         }
-        /* NOUVEAU v0.11 - Historique détaillé */
         .history-day-item {
             cursor: pointer;
             transition: all 0.2s;
@@ -358,11 +357,9 @@
             background: #27272a;
             transform: translateX(4px);
         }
-        /* NOUVEAU v0.11 - Canvas caché pour partage */
         #shareCanvas {
             display: none;
         }
-        /* NOUVEAU v0.11.5 - Pagination icônes */
         .icon-pagination {
             display: flex;
             justify-content: center;
@@ -401,7 +398,6 @@
             overflow: hidden;
             touch-action: pan-y;
         }
-        /* NOUVEAU v0.11.5 - Style pour limites popup */
         .limit-warning-popup .popup-content {
             background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
             color: white;
@@ -430,9 +426,24 @@
     <div id="app">Chargement...</div>
     <canvas id="shareCanvas" width="1080" height="1920"></canvas>
     
-    <!-- Popups existants -->
-    <div id="aboutPopup" class="popup"><div class="popup-content"><p>©2025 SanteMentale.org</p><p>API : 0.dev</p><p id="appVersion"></p><p id="clientUUID"></p><button class="close-btn" onclick="closePopup('aboutPopup')">Fermer</button></div></div>
-    <div id="privacyPopup" class="popup"><div class="popup-content"><p>SanteMentale.org respecte votre vie privée. Aucune donnée personnelle n'est collectée. Tout est stocké sur votre appareil.</p><button class="close-btn" onclick="closePopup('privacyPopup')">Fermer</button></div></div>
+    <!-- Popups -->
+    <div id="aboutPopup" class="popup">
+        <div class="popup-content">
+            <p>©2025 SanteMentale.org</p>
+            <p>API : 0.dev</p>
+            <p id="appVersion"></p>
+            <p id="clientUUID"></p>
+            <button class="close-btn" onclick="closePopup('aboutPopup')">Fermer</button>
+        </div>
+    </div>
+    
+    <div id="privacyPopup" class="popup">
+        <div class="popup-content">
+            <p>SanteMentale.org respecte votre vie privée. Aucune donnée personnelle n'est collectée. Tout est stocké sur votre appareil.</p>
+            <button class="close-btn" onclick="closePopup('privacyPopup')">Fermer</button>
+        </div>
+    </div>
+    
     <div id="editRoutinePopup" class="popup">
         <div class="popup-content" style="text-align:left;">
             <h3 style="font-weight:bold;margin-bottom:15px;text-align:center;">Modifier la routine</h3>
@@ -447,6 +458,7 @@
             <button class="close-btn" onclick="closePopup('editRoutinePopup')" style="width:100%;">Annuler</button>
         </div>
     </div>
+    
     <div id="addTaskPopup" class="popup">
         <div class="popup-content" style="text-align:left;">
             <h3 class="title-genos" style="font-weight:bold;margin-bottom:20px;text-align:center;font-size:28px;">Ajouter une tâche</h3>
@@ -462,6 +474,7 @@
             <button class="close-btn" onclick="closePopup('addTaskPopup')" style="width:100%;">Annuler</button>
         </div>
     </div>
+    
     <div id="editTaskPopup" class="popup">
         <div class="popup-content" style="text-align:left;">
             <h3 class="task-name-sofia" style="font-weight:bold;margin-bottom:15px;text-align:center;">Modifier la tâche</h3>
@@ -478,6 +491,7 @@
             <button class="close-btn" onclick="closePopup('editTaskPopup')" style="width:100%;">Annuler</button>
         </div>
     </div>
+    
     <div id="badgeDetailPopup" class="popup">
         <div class="popup-content">
             <div id="badgeDetailContent"></div>
@@ -485,16 +499,16 @@
         </div>
     </div>
     
-    <!-- NOUVEAU v0.11 - Popup détails jour historique -->
     <div id="dayDetailPopup" class="popup">
-        <div class="popup-content" style="text-align:left;">
-            <h3 id="dayDetailTitle" style="font-weight:bold;margin-bottom:15px;text-align:center;"></h3>
+        <div class="popup-content" style="text-align:left; position: relative;">
+            <div class="whats-new-header">
+                <h3 id="dayDetailTitle" style="font-weight:bold;margin-bottom:15px;text-align:center;"></h3>
+                <button class="whats-new-close" onclick="closePopup('dayDetailPopup')" style="display:block;">✕</button>
+            </div>
             <div id="dayDetailContent"></div>
-            <button class="close-btn" onclick="closePopup('dayDetailPopup')" style="width:100%;margin-top:15px;">Fermer</button>
         </div>
     </div>
     
-    <!-- NOUVEAU v0.11.5 - Popup limite capacité -->
     <div id="limitWarningPopup" class="popup limit-warning-popup">
         <div class="popup-content">
             <h3>⚠️ Limite atteinte</h3>
@@ -505,22 +519,25 @@
     
     <div id="achievementNotification" class="achievement-notification">
         <div style="display:flex;align-items:center;gap:12px;">
-            <span class="material-icons" style="font-size:40px;">emoji_events</span>
+            <span class="material-symbols-outlined" style="font-size:40px;">emoji_events</span>
             <div>
                 <div style="font-weight:bold;font-size:16px;">Achievement débloqué !</div>
                 <div id="achievementText" style="font-size:14px;margin-top:4px;"></div>
             </div>
         </div>
     </div>
+    
     <div id="helpModalPopup" class="popup help-modal-popup">
         <div class="popup-content">
-            <div class="help-modal-title">Routines — v0.11.5-beta</div>
+            <div class="help-modal-title">Routines — v0.12-beta</div>
             <div class="help-modal-buttons">
                 <button class="help-modal-btn primary" onclick="showWhatsNew()">Quoi de neuf ?</button>
                 <button class="help-modal-btn primary" onclick="startTutorial();closePopup('helpModalPopup');">Tutoriel</button>
+                <button class="help-modal-btn secondary" onclick="closePopup('helpModalPopup')">Fermer</button>
             </div>
         </div>
     </div>
+    
     <div id="whatsNewPopup" class="popup whats-new-popup">
         <div class="popup-content">
             <div class="whats-new-header">
@@ -533,9 +550,11 @@
             </div>
         </div>
     </div>
+    
     <div id="tutorialOverlay" class="tutorial-overlay"></div>
     <div id="tutorialHighlight" class="tutorial-highlight"></div>
     <div id="tutorialTooltip" class="tutorial-tooltip"></div>
+    
     <script src="script.js"></script>
 </body>
 </html>
