@@ -1,7 +1,7 @@
 // ========================================
-// ROUTINES v0.12-beta - Script FINAL COMPLET (corrigé)
+// ROUTINES v0.12.1-beta - Début du script
 // ========================================
-const MODULE_REVISION = '0.12-beta';
+const MODULE_REVISION = '0.12.1-beta';
 const MAX_ROUTINES = 10;
 const MAX_TASKS = 25;
 const ICONS = [
@@ -12,7 +12,21 @@ const ICONS = [
 const TASK_ICONS = [
     'self_improvement', 'spa', 'favorite_border', 'local_cafe', 'restaurant', 'water_drop',
     'fitness_center', 'directions_run', 'bedtime', 'alarm', 'book', 'edit', 'music_note',
-    'brush', 'palette', 'shower'
+    'brush', 'palette', 'shower', 'pool', 'surfing', 'hiking', 
+    'downhill_skiing', 'skateboarding', 'directions_bike', 'electric_bike', 'electric_scooter', 'directions_walk',
+    'kayaking', 'kitesurfing', 'paragliding', 'sailing', 'scuba_diving', 
+    'sports_baseball', 'sports_basketball', 'sports_cricket', 'sports_football', 'sports_golf',
+    'sports_hockey', 'sports_mma', 'sports_rugby', 'sports_soccer', 'sports_tennis', 'sports_volleyball',
+    'self_improvement', 'spa', 'healing', 'psychology', 'mood', 'sentiment_satisfied', 'sentiment_very_satisfied',
+    'energy_savings_leaf', 'eco', 'local_florist', 'park', 'forest', 'grass', 'yard',
+    'coffee', 'lunch_dining', 'dinner_dining', 'breakfast_dining', 'ramen_dining', 'fastfood',
+    'bakery_dining', 'liquor', 'icecream', 'cake', 'cookie', 'egg_alt', 'nutrition',
+    'shower', 'bathtub', 'bathroom', 'face', 'face_retouching_natural', 'cleaning_services',
+    'wash', 'soap', 'sanitizer', 'vaccines', 'thermostat', 'medication', 'health_and_safety',
+    'visibility', 'eyeglasses', 'hearing', 'accessible', 'pregnant_woman', 'child_care',
+    'library_books', 'menu_book', 'auto_stories', 'article', 'description', 'note',
+    'draw', 'create', 'design_services', 'colorize', 'photo_camera', 'videocam', 'mic',
+    'headphones', 'speaker', 'piano'
 ];
 const ICONS_PER_PAGE = 24;
 const BADGES = [
@@ -37,13 +51,12 @@ const TUTORIAL_STEPS = [
     { target: '[onclick*="helpModalPopup"] span', title: "Besoin d'aide ?", description: "Cliquez sur l'icône d'aide pour accéder au menu des nouveautés ou relancer le tutoriel à tout moment.", anchor: 'bottom' }
 ];
 const WHATS_NEW = [
-    { icon: '🔧', title: 'Améliorations UI', desc: 'Icônes outlined, tailles ajustées, couleurs unifiées' },
-    { icon: '🐛', title: 'Corrections', desc: 'Animations, affichages, navigation calendrier' },
-    { icon: '📅', title: 'Calendrier amélioré', desc: 'Jours cliquables, swipe, pas de futur' },
-    { icon: '🆕', title: 'Popups optimisées', desc: 'Croix fermeture, scroll auto' },
-    { icon: '👆', title: 'Interactions', desc: 'Cartes cliquables, icônes plus grandes' }
+    { icon: '🎨', title: '100 icônes disponibles', desc: 'Pagination carousel avec swipe pour vos tâches' },
+    { icon: '🔧', title: 'Interface optimisée', desc: 'Icônes régulières, tailles ajustées, navigation améliorée' },
+    { icon: '📅', title: 'Calendrier perfectionné', desc: 'Détails cliquables, scroll fluide, bouton fermer' },
+    { icon: '🐛', title: 'Corrections de bugs', desc: 'Animations nettoyées, affichages unifiés' },
+    { icon: '✨', title: 'Expérience tactile', desc: 'Meilleure gestion du scroll et des interactions' }
 ];
-
 let state = {
     routines: [],
     history: [],
@@ -71,7 +84,6 @@ let state = {
     taskIconPage: 0,
     editTaskIconPage: 0
 };
-
 function initDefaultRoutines() {
     return [
         {
@@ -100,7 +112,6 @@ function initDefaultRoutines() {
         }
     ];
 }
-
 function getTotalTaskCount() {
     let total = 0;
     state.routines.forEach(routine => {
@@ -108,7 +119,6 @@ function getTotalTaskCount() {
     });
     return total;
 }
-
 function showLimitWarning(type) {
     let content = '';
     if (type === 'routines') {
@@ -134,16 +144,21 @@ function showLimitWarning(type) {
     document.getElementById('limitWarningContent').innerHTML = content;
     openPopup('limitWarningPopup');
 }
-
 function openPopup(id) {
     const popup = document.getElementById(id);
     if (popup) {
         popup.style.display = 'flex';
+        setTimeout(() => {
+            const content = popup.querySelector('.popup-content');
+            if (content) {
+                content.scrollTop = 0;
+                preventPullToRefresh(content);
+            }
+        }, 100);
     } else {
         console.warn('Popup non trouvée:', id);
     }
 }
-
 function closePopup(id) {
     const popup = document.getElementById(id);
     if (popup) {
@@ -154,70 +169,63 @@ function closePopup(id) {
         state.isFirstTimeView = false;
     }
 }
-
-function showWhatsNew() { 
-    closePopup('helpModalPopup'); 
-    renderWhatsNew(true); 
-    openPopup('whatsNewPopup'); 
+function showWhatsNew() {
+    closePopup('helpModalPopup');
+    renderWhatsNew(true);
+    openPopup('whatsNewPopup');
 }
-
-function startTutorial() { 
-    state.tutorialStep = 0; 
-    showTutorialStep(); 
+function startTutorial() {
+    state.tutorialStep = 0;
+    showTutorialStep();
 }
-
 function showTutorialStep() {
-    if (state.tutorialStep >= TUTORIAL_STEPS.length) { 
-        closeTutorial(); 
-        return; 
+    if (state.tutorialStep >= TUTORIAL_STEPS.length) {
+        closeTutorial();
+        return;
     }
     const step = TUTORIAL_STEPS[state.tutorialStep];
     const target = document.querySelector(step.target);
-    if (!target) { 
-        state.tutorialStep++; 
-        showTutorialStep(); 
-        return; 
+    if (!target) {
+        state.tutorialStep++;
+        showTutorialStep();
+        return;
     }
     const overlay = document.getElementById('tutorialOverlay');
     const highlight = document.getElementById('tutorialHighlight');
     const tooltip = document.getElementById('tutorialTooltip');
-    overlay.style.display = 'block'; 
+    overlay.style.display = 'block';
     highlight.style.display = 'block';
     const rect = target.getBoundingClientRect();
-    highlight.style.left = (rect.left - 5) + 'px'; 
+    highlight.style.left = (rect.left - 5) + 'px';
     highlight.style.top = (rect.top - 5) + 'px';
-    highlight.style.width = (rect.width + 10) + 'px'; 
+    highlight.style.width = (rect.width + 10) + 'px';
     highlight.style.height = (rect.height + 10) + 'px';
     let tooltipHTML = '<h3>' + step.title + '</h3><p>' + step.description + '</p><div class="tutorial-buttons">';
     tooltipHTML += '<button class="tutorial-btn skip" onclick="skipTutorial()">Passer</button>';
     tooltipHTML += '<button class="tutorial-btn next" onclick="nextTutorialStep()">Suivant</button></div>';
-    tooltip.innerHTML = tooltipHTML; 
+    tooltip.innerHTML = tooltipHTML;
     tooltip.style.display = 'block';
     let tooltipLeft = rect.left + rect.width / 2 - 160;
     let tooltipTop = step.anchor === 'bottom' ? rect.bottom + 20 : rect.top - 180;
     tooltipLeft = Math.max(10, Math.min(tooltipLeft, window.innerWidth - 330));
     tooltipTop = Math.max(10, tooltipTop);
-    tooltip.style.left = tooltipLeft + 'px'; 
+    tooltip.style.left = tooltipLeft + 'px';
     tooltip.style.top = tooltipTop + 'px';
 }
-
-function nextTutorialStep() { 
-    state.tutorialStep++; 
-    showTutorialStep(); 
+function nextTutorialStep() {
+    state.tutorialStep++;
+    showTutorialStep();
 }
-
-function skipTutorial() { 
-    closeTutorial(); 
+function skipTutorial() {
+    closeTutorial();
 }
-
 function closeTutorial() {
     document.getElementById('tutorialOverlay').style.display = 'none';
     document.getElementById('tutorialHighlight').style.display = 'none';
     document.getElementById('tutorialTooltip').style.display = 'none';
-    state.tutorialStep = -1; 
+    state.tutorialStep = -1;
     localStorage.setItem('routineLastSeenVersion', MODULE_REVISION);
 }
-
 function renderWhatsNew(showClose) {
     let content = WHATS_NEW.map(item =>
         '<div class="whats-new-item"><div class="whats-new-icon">' + item.icon + '</div>' +
@@ -226,14 +234,13 @@ function renderWhatsNew(showClose) {
     document.getElementById('whatsNewContent').innerHTML = content;
     document.getElementById('whatsNewCloseBtn').style.display = showClose ? 'block' : 'none';
 }
-
 function generateShareImage() {
     const canvas = document.getElementById('shareCanvas');
     const ctx = canvas.getContext('2d');
     const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    gradient.addColorStop(0, '#1e3a8a'); 
+    gradient.addColorStop(0, '#1e3a8a');
     gradient.addColorStop(1, '#1e40af');
-    ctx.fillStyle = gradient; 
+    ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     const logoImg = new Image();
     logoImg.crossOrigin = 'anonymous';
@@ -246,7 +253,6 @@ function generateShareImage() {
     };
     logoImg.src = 'https://santementale.org/favicon.ico';
 }
-
 function drawShareContent(ctx, canvas) {
     const username = 'Utilisateur';
     const prideQuotes = [
@@ -256,51 +262,51 @@ function drawShareContent(ctx, canvas) {
         'Admirez la progression de ' + username + ' !'
     ];
     const quote = prideQuotes[Math.floor(Math.random() * prideQuotes.length)];
-    ctx.fillStyle = '#ffffff'; 
-    ctx.font = '36px sans-serif'; 
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '36px sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText(quote, canvas.width / 2, 220);
-    ctx.fillStyle = '#ffffff'; 
-    ctx.font = 'bold 80px sans-serif'; 
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 80px sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('Ma Progression Routines', canvas.width / 2, 320);
-    ctx.font = 'bold 120px sans-serif'; 
+    ctx.font = 'bold 120px sans-serif';
     ctx.fillStyle = '#fbbf24';
-    ctx.fillText('⭐  Niveau ' + state.level, canvas.width / 2, 480);
+    ctx.fillText('⭐ Niveau ' + state.level, canvas.width / 2, 480);
     const xpInLevel = state.xp % XP_PER_LEVEL;
-    ctx.font = '50px sans-serif'; 
+    ctx.font = '50px sans-serif';
     ctx.fillStyle = '#ffffff';
     ctx.fillText(xpInLevel + ' / ' + XP_PER_LEVEL + ' XP', canvas.width / 2, 560);
     const barWidth = 800, barHeight = 60, barX = (canvas.width - barWidth) / 2, barY = 610;
-    ctx.fillStyle = '#18181b'; 
+    ctx.fillStyle = '#18181b';
     ctx.fillRect(barX, barY, barWidth, barHeight);
     const fillWidth = (xpInLevel / XP_PER_LEVEL) * barWidth;
     const fillGradient = ctx.createLinearGradient(barX, 0, barX + barWidth, 0);
-    fillGradient.addColorStop(0, '#3B82F6'); 
+    fillGradient.addColorStop(0, '#3B82F6');
     fillGradient.addColorStop(1, '#60A5FA');
-    ctx.fillStyle = fillGradient; 
+    ctx.fillStyle = fillGradient;
     ctx.fillRect(barX, barY, fillWidth, barHeight);
-    const statsY = 760; 
-    ctx.font = 'bold 60px sans-serif'; 
+    const statsY = 760;
+    ctx.font = 'bold 60px sans-serif';
     ctx.fillStyle = '#ffffff';
     ctx.fillText('🔥 ' + state.streak + ' jours', canvas.width / 2, statsY);
-    ctx.font = '50px sans-serif'; 
+    ctx.font = '50px sans-serif';
     ctx.fillText(state.totalTasksCompleted + ' tâches complétées', canvas.width / 2, statsY + 80);
-    ctx.fillText('✨  ' + state.perfectDaysCount + ' journées parfaites', canvas.width / 2, statsY + 160);
-    ctx.font = 'bold 50px sans-serif'; 
+    ctx.fillText('✨ ' + state.perfectDaysCount + ' journées parfaites', canvas.width / 2, statsY + 160);
+    ctx.font = 'bold 50px sans-serif';
     ctx.fillText('Mes meilleurs badges', canvas.width / 2, statsY + 280);
     const topBadges = state.unlockedBadges.slice(0, 3);
     let badgeY = statsY + 360;
     topBadges.forEach((badgeId, index) => {
         const badge = BADGES.find(b => b.id === badgeId);
         if (badge) {
-            ctx.font = '80px sans-serif'; 
+            ctx.font = '80px sans-serif';
             ctx.fillText(badge.icon, canvas.width / 2 - 300 + (index * 300), badgeY);
-            ctx.font = '40px sans-serif'; 
+            ctx.font = '40px sans-serif';
             ctx.fillText(badge.name, canvas.width / 2 - 300 + (index * 300), badgeY + 80);
         }
     });
-    ctx.font = '40px sans-serif'; 
+    ctx.font = '40px sans-serif';
     ctx.fillStyle = 'rgba(255,255,255,0.7)';
     ctx.fillText('SanteMentale.org', canvas.width / 2, canvas.height - 100);
     canvas.toBlob(async blob => {
@@ -331,7 +337,6 @@ function drawShareContent(ctx, canvas) {
         }
     });
 }
-
 function showDayDetail(dateStr) {
     const dayData = state.history.find(h => h.date === dateStr);
     if (!dayData) return;
@@ -361,11 +366,29 @@ function showDayDetail(dateStr) {
     else if (completion > 0) completionColor = '#3B82F6';
     html = '<div style="background:' + completionColor + ';color:white;padding:12px;border-radius:8px;margin-bottom:20px;text-align:center;font-weight:bold;font-size:18px;">Complétion : ' +
         completion + '%</div>' + html;
-    document.getElementById('dayDetailContent').innerHTML = html; 
+    document.getElementById('dayDetailContent').innerHTML = html;
     openPopup('dayDetailPopup');
-    document.querySelector('#dayDetailPopup .popup-content').scrollTop = 0;
+    setTimeout(() => {
+        const popupContent = document.querySelector('#dayDetailPopup .popup-content');
+        if (popupContent) {
+            popupContent.scrollTop = 0;
+            preventPullToRefresh(popupContent);
+        }
+    }, 100);
 }
-
+function preventPullToRefresh(element) {
+    let startY = 0;
+    element.addEventListener('touchstart', function(e) {
+        startY = e.touches[0].pageY;
+    }, { passive: true });
+    element.addEventListener('touchmove', function(e) {
+        const y = e.touches[0].pageY;
+        if (element.scrollTop === 0 && y > startY) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+}
+// Partie 2 du script
 function renderHistoryList() {
     const sortedHistory = state.history.slice().sort((a, b) => {
         const dateA = new Date(a.date.split('/').reverse().join('-'));
@@ -380,9 +403,9 @@ function renderHistoryList() {
         html += '<div class="space-y-2">';
         sortedHistory.forEach(day => {
             let total = 0, completed = 0;
-            state.routines.forEach(r => r.tasks.forEach(t => { 
-                total++; 
-                if (day.routines[r.id] && day.routines[r.id][t.id]) completed++; 
+            state.routines.forEach(r => r.tasks.forEach(t => {
+                total++;
+                if (day.routines[r.id] && day.routines[r.id][t.id]) completed++;
             }));
             const completion = total > 0 ? Math.round((completed / total) * 100) : 0;
             let bgColor = '#18181b', textColor = '#71717a';
@@ -399,36 +422,33 @@ function renderHistoryList() {
     html += '</div>';
     return html;
 }
-
 function gainXP(amount) {
     state.xp += amount;
     const oldLevel = state.level;
     state.level = Math.floor(state.xp / XP_PER_LEVEL) + 1;
     localStorage.setItem('routineXP', state.xp.toString());
     localStorage.setItem('routineLevel', state.level.toString());
-    if (state.level > oldLevel) { 
-        showAchievementNotification('Niveau ' + state.level + ' atteint ! 🎉'); 
-        triggerConfetti(); 
+    if (state.level > oldLevel) {
+        showAchievementNotification('Niveau ' + state.level + ' atteint ! 🎉');
+        triggerConfetti();
     }
 }
-
-function triggerConfetti() { 
-    if (typeof confetti !== 'undefined') confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } }); 
+function triggerConfetti() {
+    if (typeof confetti !== 'undefined') confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
 }
-
 function checkBadges() {
     BADGES.forEach(badge => {
         if (state.unlockedBadges.includes(badge.id)) return;
         let unlock = false;
         switch (badge.requirement) {
-            case 'tasks': 
-                unlock = state.totalTasksCompleted >= badge.threshold; 
+            case 'tasks':
+                unlock = state.totalTasksCompleted >= badge.threshold;
                 break;
-            case 'streak': 
-                unlock = state.streak >= badge.threshold; 
+            case 'streak':
+                unlock = state.streak >= badge.threshold;
                 break;
-            case 'perfect_days': 
-                unlock = state.perfectDaysCount >= badge.threshold; 
+            case 'perfect_days':
+                unlock = state.perfectDaysCount >= badge.threshold;
                 break;
             case 'morning_routines': {
                 const morningRoutine = state.routines.find(r => r.name.toLowerCase().includes('matin'));
@@ -459,19 +479,17 @@ function checkBadges() {
         if (unlock) {
             state.unlockedBadges.push(badge.id);
             localStorage.setItem('routineBadges', JSON.stringify(state.unlockedBadges));
-            showAchievementNotification(badge.icon + ' ' + badge.name + ' débloqué !'); 
+            showAchievementNotification(badge.icon + ' ' + badge.name + ' débloqué !');
             triggerConfetti();
         }
     });
 }
-
 function showAchievementNotification(text) {
     const notif = document.getElementById('achievementNotification');
     document.getElementById('achievementText').textContent = text;
     notif.classList.add('show');
     setTimeout(() => notif.classList.remove('show'), 4000);
 }
-
 function toggleTask(routineId, taskId) {
     const routine = state.routines.find(r => r.id === routineId);
     if (!routine) return;
@@ -480,38 +498,37 @@ function toggleTask(routineId, taskId) {
     task.completed = !task.completed;
     const today = state.currentDate;
     let dayHistory = state.history.find(h => h.date === today);
-    if (!dayHistory) { 
-        dayHistory = { date: today, routines: {} }; 
-        state.history.push(dayHistory); 
+    if (!dayHistory) {
+        dayHistory = { date: today, routines: {} };
+        state.history.push(dayHistory);
     }
     if (!dayHistory.routines[routineId]) dayHistory.routines[routineId] = {};
     dayHistory.routines[routineId][taskId] = task.completed;
     if (task.completed) {
-        gainXP(XP_PER_TASK); 
-        state.totalTasksCompleted++; 
+        gainXP(XP_PER_TASK);
+        state.totalTasksCompleted++;
         localStorage.setItem('routineTotalTasks', state.totalTasksCompleted.toString());
     } else {
         state.xp = Math.max(0, state.xp - XP_PER_TASK);
         state.totalTasksCompleted = Math.max(0, state.totalTasksCompleted - 1);
         state.level = Math.floor(state.xp / XP_PER_LEVEL) + 1;
-        localStorage.setItem('routineXP', state.xp.toString()); 
+        localStorage.setItem('routineXP', state.xp.toString());
         localStorage.setItem('routineLevel', state.level.toString());
         localStorage.setItem('routineTotalTasks', state.totalTasksCompleted.toString());
     }
     const completion = getTodayCompletion();
-    if (completion === 100) { 
-        state.perfectDaysCount++; 
-        localStorage.setItem('routinePerfectDays', state.perfectDaysCount.toString()); 
-        triggerConfetti(); 
+    if (completion === 100) {
+        state.perfectDaysCount++;
+        localStorage.setItem('routinePerfectDays', state.perfectDaysCount.toString());
+        triggerConfetti();
     }
     localStorage.setItem('routines', JSON.stringify(state.routines));
     localStorage.setItem('routineHistory', JSON.stringify(state.history));
-    calcStreak(); 
-    checkBadges(); 
+    calcStreak();
+    checkBadges();
     render();
     return false;
 }
-
 function renderIconPaginationControls(iconArray, currentPage, onPageChange, containerId) {
     const totalPages = Math.ceil(iconArray.length / ICONS_PER_PAGE);
     const container = document.getElementById(containerId);
@@ -524,25 +541,21 @@ function renderIconPaginationControls(iconArray, currentPage, onPageChange, cont
     }
     container.innerHTML = html;
 }
-
 function changeRoutineIconPage(direction) {
     const totalPages = Math.ceil(ICONS.length / ICONS_PER_PAGE);
     state.routineIconPage = Math.max(0, Math.min(totalPages - 1, state.routineIconPage + direction));
     renderIconPicker();
 }
-
 function changeTaskIconPage(direction) {
     const totalPages = Math.ceil(TASK_ICONS.length / ICONS_PER_PAGE);
     state.taskIconPage = Math.max(0, Math.min(totalPages - 1, state.taskIconPage + direction));
     renderTaskIconPicker();
 }
-
 function changeEditTaskIconPage(direction) {
     const totalPages = Math.ceil(TASK_ICONS.length / ICONS_PER_PAGE);
     state.editTaskIconPage = Math.max(0, Math.min(totalPages - 1, state.editTaskIconPage + direction));
     renderEditTaskIconPicker();
 }
-
 function openEditRoutine(routineId) {
     state.editingRoutineId = routineId;
     state.routineIconPage = 0;
@@ -552,7 +565,6 @@ function openEditRoutine(routineId) {
     renderIconPicker();
     openPopup('editRoutinePopup');
 }
-
 function saveRoutineEdit() {
     const routine = state.routines.find(r => r.id === state.editingRoutineId);
     routine.name = document.getElementById('routineNameInput').value.trim() || routine.name;
@@ -562,7 +574,6 @@ function saveRoutineEdit() {
     checkBadges();
     render();
 }
-
 function renderIconPicker() {
     const startIdx = state.routineIconPage * ICONS_PER_PAGE;
     const endIdx = Math.min(startIdx + ICONS_PER_PAGE, ICONS.length);
@@ -573,7 +584,6 @@ function renderIconPicker() {
     ).join('');
     renderIconPaginationControls(ICONS, state.routineIconPage, 'changeRoutineIconPage', 'routineIconPagination');
 }
-
 function openAddTask(routineId) {
     if (getTotalTaskCount() >= MAX_TASKS) {
         showLimitWarning('tasks');
@@ -587,7 +597,6 @@ function openAddTask(routineId) {
     renderTaskIconPicker();
     openPopup('addTaskPopup');
 }
-
 function renderTaskIconPicker() {
     const startIdx = state.taskIconPage * ICONS_PER_PAGE;
     const endIdx = Math.min(startIdx + ICONS_PER_PAGE, TASK_ICONS.length);
@@ -598,7 +607,6 @@ function renderTaskIconPicker() {
     ).join('');
     renderIconPaginationControls(TASK_ICONS, state.taskIconPage, 'changeTaskIconPage', 'taskIconPagination');
 }
-
 function saveNewTask() {
     const name = document.getElementById('taskNameInput').value.trim();
     if (!name) return;
@@ -615,7 +623,6 @@ function saveNewTask() {
     closePopup('addTaskPopup');
     render();
 }
-
 function openEditTask(routineId, taskId) {
     state.editingTaskRoutineId = routineId;
     state.editingTaskId = taskId;
@@ -628,7 +635,6 @@ function openEditTask(routineId, taskId) {
     renderEditTaskIconPicker();
     openPopup('editTaskPopup');
 }
-
 function renderEditTaskIconPicker() {
     const startIdx = state.editTaskIconPage * ICONS_PER_PAGE;
     const endIdx = Math.min(startIdx + ICONS_PER_PAGE, TASK_ICONS.length);
@@ -639,7 +645,6 @@ function renderEditTaskIconPicker() {
     ).join('');
     renderIconPaginationControls(TASK_ICONS, state.editTaskIconPage, 'changeEditTaskIconPage', 'editTaskIconPagination');
 }
-
 function saveTaskEdit() {
     const routine = state.routines.find(r => r.id === state.editingTaskRoutineId);
     const task = routine.tasks.find(t => t.id === state.editingTaskId);
@@ -651,7 +656,6 @@ function saveTaskEdit() {
     closePopup('editTaskPopup');
     render();
 }
-
 function deleteTask(routineId, taskId) {
     if (!confirm('Supprimer cette tâche ?')) return;
     const routine = state.routines.find(r => r.id === routineId);
@@ -659,14 +663,12 @@ function deleteTask(routineId, taskId) {
     localStorage.setItem('routines', JSON.stringify(state.routines));
     render();
 }
-
 function deleteRoutine(routineId) {
     if (!confirm('Supprimer cette routine complète ?')) return;
     state.routines = state.routines.filter(r => r.id !== routineId);
     localStorage.setItem('routines', JSON.stringify(state.routines));
     render();
 }
-
 function addNewRoutine() {
     if (state.routines.length >= MAX_ROUTINES) {
         showLimitWarning('routines');
@@ -680,25 +682,22 @@ function addNewRoutine() {
     checkBadges();
     render();
 }
-
 function getTodayCompletion() {
     const today = state.history.find(h => h.date === state.currentDate);
     if (!today) return 0;
     let total = 0, completed = 0;
-    state.routines.forEach(r => r.tasks.forEach(t => { 
-        total++; 
-        if (today.routines[r.id] && today.routines[r.id][t.id]) completed++; 
+    state.routines.forEach(r => r.tasks.forEach(t => {
+        total++;
+        if (today.routines[r.id] && today.routines[r.id][t.id]) completed++;
     }));
     return total > 0 ? Math.round((completed / total) * 100) : 0;
 }
-
 function getRoutineCompletion(routineId) {
     const routine = state.routines.find(r => r.id === routineId);
     if (!routine || routine.tasks.length === 0) return 0;
     const completed = routine.tasks.filter(t => t.completed).length;
     return Math.round((completed / routine.tasks.length) * 100);
 }
-
 function calcStreak() {
     let s = 0;
     const today = new Date();
@@ -710,17 +709,16 @@ function calcStreak() {
         if (dayData) {
             let dayTotal = 0, dayCompleted = 0;
             state.routines.forEach(r => r.tasks.forEach(t => {
-                dayTotal++; 
+                dayTotal++;
                 if (dayData.routines[r.id] && dayData.routines[r.id][t.id]) dayCompleted++;
             }));
-            if (dayTotal > 0 && dayCompleted / dayTotal >= 0.75) s++; 
+            if (dayTotal > 0 && dayCompleted / dayTotal >= 0.75) s++;
             else break;
         } else break;
     }
     state.streak = s;
     localStorage.setItem('routineStreak', s.toString());
 }
-
 function renderCal() {
     const y = state.calendarDate.getFullYear(), m = state.calendarDate.getMonth();
     const first = new Date(y, m, 1), last = new Date(y, m + 1, 0);
@@ -742,7 +740,7 @@ function renderCal() {
         if (dayData) {
             let total = 0, completed = 0;
             state.routines.forEach(r => r.tasks.forEach(t => {
-                total++; 
+                total++;
                 if (dayData.routines[r.id] && dayData.routines[r.id][t.id]) completed++;
             }));
             completion = total > 0 ? completed / total : 0;
@@ -765,21 +763,20 @@ function renderCal() {
     h += '<div><span class="inline-block w-3 h-3 rounded" style="background:#10B981"></span> 76-100%</div></div></div>';
     return h;
 }
-
 function showBadgeDetail(badgeId) {
     const badge = BADGES.find(b => b.id === badgeId);
     if (!badge) return;
     const unlocked = state.unlockedBadges.includes(badgeId);
     let progress = 0;
     switch (badge.requirement) {
-        case 'tasks': 
-            progress = Math.min(100, Math.round((state.totalTasksCompleted / badge.threshold) * 100)); 
+        case 'tasks':
+            progress = Math.min(100, Math.round((state.totalTasksCompleted / badge.threshold) * 100));
             break;
-        case 'streak': 
-            progress = Math.min(100, Math.round((state.streak / badge.threshold) * 100)); 
+        case 'streak':
+            progress = Math.min(100, Math.round((state.streak / badge.threshold) * 100));
             break;
-        case 'perfect_days': 
-            progress = Math.min(100, Math.round((state.perfectDaysCount / badge.threshold) * 100)); 
+        case 'perfect_days':
+            progress = Math.min(100, Math.round((state.perfectDaysCount / badge.threshold) * 100));
             break;
     }
     let html = '<div style="text-align:center;"><div style="font-size:60px;margin-bottom:15px;' + (unlocked ? '' : 'filter:grayscale(100%);opacity:0.3;') + '">' + badge.icon + '</div>';
@@ -795,7 +792,6 @@ function showBadgeDetail(badgeId) {
     document.getElementById('badgeDetailContent').innerHTML = html;
     openPopup('badgeDetailPopup');
 }
-
 function renderStatsChart() {
     setTimeout(() => {
         const canvas = document.getElementById('statsChart');
@@ -813,7 +809,7 @@ function renderStatsChart() {
             if (dayData) {
                 let total = 0, completed = 0;
                 state.routines.forEach(r => r.tasks.forEach(t => {
-                    total++; 
+                    total++;
                     if (dayData.routines[r.id] && dayData.routines[r.id][t.id]) completed++;
                 }));
                 data.push(total > 0 ? Math.round((completed / total) * 100) : 0);
@@ -834,22 +830,21 @@ function renderStatsChart() {
         });
     }, 100);
 }
-
 function render() {
     const app = document.getElementById('app');
     const clientVersion = localStorage.getItem('client_version') || '1.web';
     let h = '<div class="bg-zinc-900 border-b border-zinc-800 sticky top-0 z-50"><div class="max-w-2xl mx-auto px-4 py-4 flex items-center gap-3">';
     h += '<a href="/v1/outils/?v=' + clientVersion + '" class="back-btn" style="flex-shrink:0;"><span class="material-symbols-outlined">arrow_back</span></a>';
-    h += '<h1 class="text-3xl font-bold title-genos">Routines <button onclick="openPopup(\'helpModalPopup\')" style="background:none;border:none;cursor:pointer;color:#3B82F6;padding:0;margin-left:8px;"><span class="material-symbols-outlined" style="font-size:22px;">help</span></button></h1>';
-    h += '<div style="margin-left:auto;"><span class="material-symbols-outlined title-icon-animated" style="color:#3B82F6;font-size:32px;">routine</span></div></div></div>';
+    h += '<h1 class="text-3xl font-bold title-genos" style="flex:1;">Routines</h1>';
+    h += '<button onclick="openPopup(\'helpModalPopup\')" style="background:none;border:none;cursor:pointer;color:#3B82F6;padding:0;margin-right:8px;"><span class="material-symbols-outlined" style="font-size:22px;">help_outline</span></button>';
+    h += '<div><span class="material-symbols-outlined title-icon-animated" style="color:#3B82F6;font-size:32px;">routine</span></div></div></div>';
     h += '<div class="bg-zinc-900 border-b border-zinc-800"><div class="max-w-2xl mx-auto px-4"><div class="flex gap-1 justify-around">';
-    h += '<button onclick="state.view=\'today\';render();" class="py-4 px-3 transition-all ' + (state.view === 'today' ? 'text-blue-400 border-b-2 border-blue-500' : 'text-zinc-500') + '"><span class="material-symbols-outlined" style="font-size:30px;">today</span></button>';
-    h += '<button onclick="state.view=\'calendar\';render();" class="py-4 px-3 transition-all ' + (state.view === 'calendar' ? 'text-blue-400 border-b-2 border-blue-500' : 'text-zinc-500') + '"><span class="material-symbols-outlined" style="font-size:30px;">calendar_month</span></button>';
-    h += '<button onclick="state.view=\'stats\';render();" class="py-4 px-3 transition-all ' + (state.view === 'stats' ? 'text-blue-400 border-b-2 border-blue-500' : 'text-zinc-500') + '"><span class="material-symbols-outlined" style="font-size:30px;">show_chart</span></button>';
-    h += '<button onclick="state.view=\'manage\';render();" class="py-4 px-3 transition-all ' + (state.view === 'manage' ? 'text-blue-400 border-b-2 border-blue-500' : 'text-zinc-500') + '"><span class="material-symbols-outlined" style="font-size:30px;">settings</span></button>';
-    h += '<button onclick="state.view=\'goals\';render();" class="py-4 px-3 transition-all ' + (state.view === 'goals' ? 'text-blue-400 border-b-2 border-blue-500' : 'text-zinc-500') + '"><span class="material-symbols-outlined" style="font-size:30px;">local_fire_department</span></button>';
+    h += '<button onclick="state.view=\'today\';render();" class="py-4 px-3 transition-all ' + (state.view === 'today' ? 'text-blue-400 border-b-2 border-blue-500' : 'text-zinc-500') + '"><span class="material-icons" style="font-size:30px;">today</span></button>';
+    h += '<button onclick="state.view=\'calendar\';render();" class="py-4 px-3 transition-all ' + (state.view === 'calendar' ? 'text-blue-400 border-b-2 border-blue-500' : 'text-zinc-500') + '"><span class="material-icons" style="font-size:30px;">calendar_month</span></button>';
+    h += '<button onclick="state.view=\'stats\';render();" class="py-4 px-3 transition-all ' + (state.view === 'stats' ? 'text-blue-400 border-b-2 border-blue-500' : 'text-zinc-500') + '"><span class="material-icons" style="font-size:30px;">show_chart</span></button>';
+    h += '<button onclick="state.view=\'goals\';render();" class="py-4 px-3 transition-all ' + (state.view === 'goals' ? 'text-blue-400 border-b-2 border-blue-500' : 'text-zinc-500') + '"><span class="material-icons" style="font-size:30px;">local_fire_department</span></button>';
+    h += '<button onclick="state.view=\'manage\';render();" class="py-4 px-3 transition-all ' + (state.view === 'manage' ? 'text-blue-400 border-b-2 border-blue-500' : 'text-zinc-500') + '"><span class="material-icons" style="font-size:30px;">settings</span></button>';
     h += '</div></div></div><div class="max-w-2xl mx-auto px-4 py-6">';
-    
     const xpInLevel = state.xp % XP_PER_LEVEL;
     const xpPercent = (xpInLevel / XP_PER_LEVEL) * 100;
     if (state.view !== 'manage') {
@@ -857,7 +852,6 @@ function render() {
         h += '<div class="flex items-center justify-between mb-2" style="position:relative;z-index:1;"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-yellow-400" style="font-size:28px;">star</span><span class="font-bold text-lg">Niveau ' + state.level + '</span></div>';
         h += '<span class="text-sm text-zinc-400">' + xpInLevel + ' / ' + XP_PER_LEVEL + ' XP</span></div><div class="xp-bar"><div class="xp-fill" style="width:' + xpPercent + '%"></div><div class="xp-text">' + Math.round(xpPercent) + '%</div></div></div>';
     }
-
     if (state.view === 'today') {
         const completion = getTodayCompletion();
         let completionColor = '#71717a';
@@ -876,12 +870,12 @@ function render() {
             else if (rc >= 26) rcColor = '#EF4444';
             else if (rc > 0) rcColor = '#3B82F6';
             h += '<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4 mb-4"><div class="flex items-center justify-between mb-3">';
-            h += '<div class="flex items-center gap-2"><span class="material-symbols-outlined text-2xl routine-icon-animated" style="color:#3B82F6;">' + routine.icon +
+            h += '<div class="flex items-center gap-2"><span class="material-symbols-outlined text-2xl" style="color:#3B82F6;">' + routine.icon +
                 '</span><h3 class="font-bold">' + routine.name + '</h3></div><span class="text-sm font-bold" style="color:' + rcColor + ';">' + rc + '%</span></div>';
             h += '<div class="space-y-2" id="tasks-' + routine.id + '">';
             routine.tasks.forEach(task => {
                 h += '<div class="flex items-center gap-3 p-3 bg-zinc-950 rounded-lg border border-zinc-800" data-task-id="' + task.id + '" data-routine-id="' + routine.id + '" onclick="toggleTask(\'' + routine.id + '\',\'' + task.id + '\')">';
-                h += '<span class="material-symbols-outlined" style="font-size:36px;">' + task.icon + '</span><div class="flex-1"><div class="font-semibold task-name-sofia ' +
+                h += '<span class="material-symbols-outlined" style="font-size:28.8px;">' + task.icon + '</span><div class="flex-1"><div class="font-semibold task-name-sofia ' +
                     (task.completed ? 'line-through text-zinc-500' : '') + '">' + task.name + '</div>';
                 h += '<div class="text-xs text-zinc-600">' + task.duration + '&nbsp;min&nbsp;&nbsp;&nbsp;+' + XP_PER_TASK + '&nbsp;XP</div></div>';
                 h += '<span class="material-symbols-outlined" style="font-size:36px; color:' + (task.completed ? '#10B981' : '#71717a') + ';">' + (task.completed ? 'check_box' : 'check_box_outline_blank') + '</span>';
@@ -911,13 +905,6 @@ function render() {
         renderStatsChart();
     } else if (state.view === 'manage') {
         h += '<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4 mb-4 text-center"><p class="text-zinc-400 italic">C\'est sur cette page que vous définissez vos routines et les tâches associées.</p></div>';
-        const totalTasks = getTotalTaskCount();
-        h += '<div class="bg-gradient-to-br from-blue-950 to-blue-900 border border-blue-800 rounded-lg p-4 mb-4 text-center">';
-        h += '<p class="text-sm text-blue-200 mb-2"><strong>Capacité utilisée</strong></p>';
-        h += '<div class="flex justify-around items-center">';
-        h += '<div><div class="text-2xl font-bold text-blue-300">' + state.routines.length + ' / ' + MAX_ROUTINES + '</div><div class="text-[10px] text-blue-300">Routines</div></div>';
-        h += '<div><div class="text-2xl font-bold text-blue-300">' + totalTasks + ' / ' + MAX_TASKS + '</div><div class="text-[10px] text-blue-300">Tâches</div></div>';
-        h += '</div></div>';
         h += '<div class="space-y-4">';
         state.routines.forEach(routine => {
             h += '<div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4"><div class="flex items-center justify-between mb-3">';
@@ -935,7 +922,14 @@ function render() {
             h += '</div><button onclick="openAddTask(\'' + routine.id + '\')" class="w-full mt-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">';
             h += '<span class="material-symbols-outlined mr-2" style="vertical-align:middle;font-size:18px;">add</span>Ajouter une tâche</button></div>';
         });
-        h += '<button onclick="addNewRoutine()" class="w-full py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700"><span class="material-symbols-outlined mr-2" style="vertical-align:middle;">add</span>Nouvelle Routine</button></div>';
+        h += '<button onclick="addNewRoutine()" class="w-full py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700"><span class="material-symbols-outlined mr-2" style="vertical-align:middle;">add</span>Nouvelle Routine</button>';
+        const totalTasks = getTotalTaskCount();
+        h += '<div class="bg-gradient-to-br from-blue-950 to-blue-900 border border-blue-800 rounded-lg p-4 mt-4 text-center">';
+        h += '<p class="text-sm text-blue-200 mb-2"><strong>Capacité utilisée</strong></p>';
+        h += '<div class="flex justify-around items-center">';
+        h += '<div><div class="text-2xl font-bold text-blue-300">' + state.routines.length + ' / ' + MAX_ROUTINES + '</div><div class="text-[10px] text-blue-300">Routines</div></div>';
+        h += '<div><div class="text-2xl font-bold text-blue-300">' + totalTasks + ' / ' + MAX_TASKS + '</div><div class="text-[10px] text-blue-300">Tâches</div></div>';
+        h += '</div></div></div>';
     } else if (state.view === 'calendar') {
         h += renderCal();
         h += '<div style="margin-top:20px;"></div>';
@@ -955,21 +949,18 @@ function render() {
         h += '</div></div><div class="bg-blue-950 border border-blue-900 rounded-lg p-4 text-sm text-blue-200">';
         h += '<span class="material-symbols-outlined mr-2" style="vertical-align:middle;">stars</span><strong>Objectif :</strong> Compléter au moins 75% de vos tâches chaque jour pour maintenir votre série !</div></div>';
     }
-
     h += '</div><div style="margin-top:40px;padding-bottom:40px;text-align:center;">';
-    h += '<p style="margin-top:30px;color:#555;font-size:14px;line-height:1.8;">App v' + clientVersion + ' • Mod v' + MODULE_REVISION + ' • Accès anticipé<br>';
+    h += '<p style="margin-top:30px;color:#555;font-size:14px;line-height:1.8;"><span style="color:#dc2626;font-weight:600;">Accès anticipé</span><br>App v' + clientVersion + ' • Mod v' + MODULE_REVISION + '<br>';
     h += '<a onclick="openPopup(\'aboutPopup\')" style="color:#0d47a1;cursor:pointer;">À propos</a> • <a onclick="openPopup(\'privacyPopup\')" style="color:#0d47a1;cursor:pointer;">Confidentialité</a><br/>';
     h += '<span style="color:#161616;">©2025 SanteMentale.org</span></p></div>';
-    
     app.innerHTML = h;
-
     if (state.view === 'manage') {
         state.routines.forEach(routine => {
             const el = document.getElementById('manage-tasks-' + routine.id);
             if (el) {
-                new Sortable(el, { 
-                    animation: 150, 
-                    handle: '.task-handle', 
+                new Sortable(el, {
+                    animation: 150,
+                    handle: '.task-handle',
                     onEnd: function (evt) {
                         const taskId = evt.item.dataset.taskId;
                         const tasks = routine.tasks;
@@ -1011,14 +1002,13 @@ function render() {
         }
     }
 }
-
 document.addEventListener('DOMContentLoaded', () => {
     try {
         const savedRoutines = localStorage.getItem('routines');
         if (savedRoutines) state.routines = JSON.parse(savedRoutines);
-        else { 
-            state.routines = initDefaultRoutines(); 
-            localStorage.setItem('routines', JSON.stringify(state.routines)); 
+        else {
+            state.routines = initDefaultRoutines();
+            localStorage.setItem('routines', JSON.stringify(state.routines));
         }
         state.history = JSON.parse(localStorage.getItem('routineHistory') || '[]');
         state.xp = parseInt(localStorage.getItem('routineXP') || '0');
@@ -1028,7 +1018,6 @@ document.addEventListener('DOMContentLoaded', () => {
         state.perfectDaysCount = parseInt(localStorage.getItem('routinePerfectDays') || '0');
         state.lastSeenVersion = localStorage.getItem('routineLastSeenVersion') || '0';
         if (!localStorage.getItem('routineGoalDays')) localStorage.setItem('routineGoalDays', '7');
-        
         const today = state.currentDate;
         let dayHistory = state.history.find(h => h.date === today);
         if (dayHistory) {
@@ -1036,39 +1025,65 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             state.routines.forEach(r => r.tasks.forEach(t => t.completed = false));
         }
-        
-        if (!localStorage.getItem('device_uuid')) { 
-            localStorage.setItem('device_uuid', crypto.randomUUID()); 
-            openPopup('privacyPopup'); 
+        if (!localStorage.getItem('device_uuid')) {
+            localStorage.setItem('device_uuid', crypto.randomUUID());
+            openPopup('privacyPopup');
         }
-        
         let cv = localStorage.getItem('client_version');
-        if (!cv) { 
-            const up = new URLSearchParams(window.location.search), vfu = up.get('v'); 
-            cv = vfu || '1.web'; 
-            localStorage.setItem('client_version', cv); 
+        if (!cv) {
+            const up = new URLSearchParams(window.location.search), vfu = up.get('v');
+            cv = vfu || '1.web';
+            localStorage.setItem('client_version', cv);
         }
-        
         document.getElementById('clientUUID').textContent = 'Client : ' + localStorage.getItem('device_uuid');
         document.getElementById('appVersion').textContent = 'App : ' + cv;
-        
-        calcStreak(); 
-        checkBadges(); 
+        calcStreak();
+        checkBadges();
         render();
-        
-        if (state.lastSeenVersion !== MODULE_REVISION) {
-            state.isFirstTimeView = true; 
-            setTimeout(() => { 
-                renderWhatsNew(false); 
-                openPopup('whatsNewPopup'); 
-            }, 1000);
+if (state.lastSeenVersion !== MODULE_REVISION) {
+            state.isFirstTimeView = true;
+            renderWhatsNew(true);
+            openPopup('whatsNewPopup');
+        }
+        // Ajouter la gestion du swipe pour les carrousels d'icônes
+        const iconPickers = ['iconPicker', 'taskIconPicker', 'editTaskIconPicker'];
+        iconPickers.forEach(pickerId => {
+            const picker = document.getElementById(pickerId);
+            if (picker) {
+                let touchStartX = 0;
+                let touchEndX = 0;
+                picker.addEventListener('touchstart', e => {
+                    touchStartX = e.changedTouches[0].screenX;
+                }, { passive: true });
+                picker.addEventListener('touchend', e => {
+                    touchEndX = e.changedTouches[0].screenX;
+                    if (touchEndX < touchStartX - 50) {
+                        if (pickerId === 'iconPicker') changeRoutineIconPage(1);
+                        else if (pickerId === 'taskIconPicker') changeTaskIconPage(1);
+                        else if (pickerId === 'editTaskIconPicker') changeEditTaskIconPage(1);
+                    }
+                    if (touchEndX > touchStartX + 50) {
+                        if (pickerId === 'iconPicker') changeRoutineIconPage(-1);
+                        else if (pickerId === 'taskIconPicker') changeTaskIconPage(-1);
+                        else if (pickerId === 'editTaskIconPicker') changeEditTaskIconPage(-1);
+                    }
+                }, { passive: true });
+            }
+        });
+        // Ajouter la gestion des popups pour empêcher le pull-to-refresh
+        const popups = ['editRoutinePopup', 'addTaskPopup', 'editTaskPopup', 'dayDetailPopup', 'badgeDetailPopup', 'whatsNewPopup', 'helpModalPopup', 'limitWarningPopup', 'aboutPopup', 'privacyPopup'];
+        popups.forEach(popupId => {
+            const popupContent = document.querySelector(`#${popupId} .popup-content`);
+            if (popupContent) {
+                preventPullToRefresh(popupContent);
+            }
+        });
+        // Vérifier si le tutoriel doit être lancé
+        if (state.tutorialStep >= 0) {
+            showTutorialStep();
         }
     } catch (e) {
-        console.error('Erreur:', e);
-        document.getElementById('app').innerHTML = '<div style="color:red;padding:20px;">Erreur: ' + e.message + '</div>';
+        console.error('Erreur lors de l\'initialisation:', e);
+        alert('Une erreur s\'est produite lors du chargement. Veuillez réessayer.');
     }
 });
-
-// ========================================
-// FIN DU SCRIPT v0.12-beta (corrigé)
-// ========================================

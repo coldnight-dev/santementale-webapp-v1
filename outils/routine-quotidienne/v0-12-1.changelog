@@ -1,0 +1,36 @@
+# Changelog - Routines v0.12.1-beta
+
+## 🎨 Améliorations de l'interface utilisateur
+
+### Icônes
+- Remplacement des icônes outlined par leur version régulière dans la barre de navigation supérieure (sauf icône d'aide)
+- Augmentation du nombre d'icônes disponibles pour les tâches : de 16 à 100 icônes pertinentes
+- Réduction de 20% de la taille des icônes dans les tâches de la vue "Today" pour une meilleure densité d'information
+- Ajout d'une pagination carousel horizontal (swipe gauche/droite compatible) pour la sélection d'icônes (4 lignes, largeur responsive)
+
+### Navigation
+- Inversion des onglets "Achievements" et "Paramètres" dans la barre de navigation supérieure
+- Alignement de l'icône d'aide à droite (à gauche de l'icône routine)
+
+### Layout
+- Déplacement du cadre "Capacité utilisée VS disponible" en bas de page dans la vue Paramètres (sous le bouton "Nouvelle routine")
+
+### Footer
+- Déplacement de "Accès anticipé" vers la ligne supérieure
+- Affichage de "Accès anticipé" en couleur rouge pour plus de visibilité
+- Suppression du point de séparation après la version du module
+
+## 🐛 Corrections de bugs
+
+### Popup de détails d'une journée calendrier
+- Correction de l'icône de fermeture (croix blanche sur blanc)
+- Ajout d'un bouton "Fermer" en bas de la popup
+- Résolution du problème de scroll : le glissement vers le haut pour scroller ne rafraîchit plus toute la page
+
+### Animations
+- Suppression des traces CSS et JavaScript de l'ancienne animation de floating des icônes de titres de routines dans la vue "Today"
+
+## 📝 Technique
+- Mise à jour du numéro de version : 0.12.1-beta
+- Optimisation du code pour une meilleure performance
+- Amélioration de la compatibilité tactile (touch events)

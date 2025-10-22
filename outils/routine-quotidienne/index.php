@@ -13,6 +13,8 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.0/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Genos:wght@400;500;600;700&family=Sofia+Sans+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { width: 100%; max-width: 100%; overflow-x: hidden; }
         body { background-color: #000; color: #fff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding-bottom: 40px; }
         .popup { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; display: none; align-items: center; justify-content: center; }
         .popup-content { background: white; color: black; width: 90%; max-width: 500px; padding: 20px; border-radius: 10px; text-align: center; max-height: 80vh; overflow-y: auto; }
@@ -56,11 +58,6 @@
             100% { transform: rotate(360deg); }
         }
         .material-symbols-outlined.title-icon-animated { animation: slow-spin 18s linear infinite; }
-        @keyframes float-drift {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-3px); }
-        }
-        .material-icons.routine-icon-animated { animation: float-drift 5s ease-in-out infinite; }
         .badge-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -420,12 +417,20 @@
             background: #3B82F6;
             color: white;
         }
+        .day-detail-popup .popup-content {
+            touch-action: pan-y;
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
+        }
+        .day-detail-popup .whats-new-close {
+            color: #000 !important;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
     <div id="app">Chargement...</div>
     <canvas id="shareCanvas" width="1080" height="1920"></canvas>
-    
     <!-- Popups -->
     <div id="aboutPopup" class="popup">
         <div class="popup-content">
@@ -436,14 +441,12 @@
             <button class="close-btn" onclick="closePopup('aboutPopup')">Fermer</button>
         </div>
     </div>
-    
     <div id="privacyPopup" class="popup">
         <div class="popup-content">
             <p>SanteMentale.org respecte votre vie privée. Aucune donnée personnelle n'est collectée. Tout est stocké sur votre appareil.</p>
             <button class="close-btn" onclick="closePopup('privacyPopup')">Fermer</button>
         </div>
     </div>
-    
     <div id="editRoutinePopup" class="popup">
         <div class="popup-content" style="text-align:left;">
             <h3 style="font-weight:bold;margin-bottom:15px;text-align:center;">Modifier la routine</h3>
@@ -458,7 +461,6 @@
             <button class="close-btn" onclick="closePopup('editRoutinePopup')" style="width:100%;">Annuler</button>
         </div>
     </div>
-    
     <div id="addTaskPopup" class="popup">
         <div class="popup-content" style="text-align:left;">
             <h3 class="title-genos" style="font-weight:bold;margin-bottom:20px;text-align:center;font-size:28px;">Ajouter une tâche</h3>
@@ -474,7 +476,6 @@
             <button class="close-btn" onclick="closePopup('addTaskPopup')" style="width:100%;">Annuler</button>
         </div>
     </div>
-    
     <div id="editTaskPopup" class="popup">
         <div class="popup-content" style="text-align:left;">
             <h3 class="task-name-sofia" style="font-weight:bold;margin-bottom:15px;text-align:center;">Modifier la tâche</h3>
@@ -491,24 +492,22 @@
             <button class="close-btn" onclick="closePopup('editTaskPopup')" style="width:100%;">Annuler</button>
         </div>
     </div>
-    
     <div id="badgeDetailPopup" class="popup">
         <div class="popup-content">
             <div id="badgeDetailContent"></div>
             <button class="close-btn" onclick="closePopup('badgeDetailPopup')" style="width:100%;margin-top:15px;">Fermer</button>
         </div>
     </div>
-    
-    <div id="dayDetailPopup" class="popup">
+    <div id="dayDetailPopup" class="popup day-detail-popup">
         <div class="popup-content" style="text-align:left; position: relative;">
             <div class="whats-new-header">
-                <h3 id="dayDetailTitle" style="font-weight:bold;margin-bottom:15px;text-align:center;"></h3>
+                <h3 id="dayDetailTitle" style="font-weight:bold;margin-bottom:15px;text-align:center;color:#000;"></h3>
                 <button class="whats-new-close" onclick="closePopup('dayDetailPopup')" style="display:block;">✕</button>
             </div>
             <div id="dayDetailContent"></div>
+            <button class="close-btn" onclick="closePopup('dayDetailPopup')" style="width:100%;margin-top:15px;">Fermer</button>
         </div>
     </div>
-    
     <div id="limitWarningPopup" class="popup limit-warning-popup">
         <div class="popup-content">
             <h3>⚠️ Limite atteinte</h3>
@@ -516,7 +515,6 @@
             <button class="close-btn" onclick="closePopup('limitWarningPopup')" style="width:100%;margin-top:15px;">J'ai compris</button>
         </div>
     </div>
-    
     <div id="achievementNotification" class="achievement-notification">
         <div style="display:flex;align-items:center;gap:12px;">
             <span class="material-symbols-outlined" style="font-size:40px;">emoji_events</span>
@@ -526,10 +524,9 @@
             </div>
         </div>
     </div>
-    
     <div id="helpModalPopup" class="popup help-modal-popup">
         <div class="popup-content">
-            <div class="help-modal-title">Routines — v0.12-beta</div>
+            <div class="help-modal-title">Routines — v0.12.1-beta</div>
             <div class="help-modal-buttons">
                 <button class="help-modal-btn primary" onclick="showWhatsNew()">Quoi de neuf ?</button>
                 <button class="help-modal-btn primary" onclick="startTutorial();closePopup('helpModalPopup');">Tutoriel</button>
@@ -537,7 +534,6 @@
             </div>
         </div>
     </div>
-    
     <div id="whatsNewPopup" class="popup whats-new-popup">
         <div class="popup-content">
             <div class="whats-new-header">
@@ -550,11 +546,64 @@
             </div>
         </div>
     </div>
-    
     <div id="tutorialOverlay" class="tutorial-overlay"></div>
     <div id="tutorialHighlight" class="tutorial-highlight"></div>
     <div id="tutorialTooltip" class="tutorial-tooltip"></div>
-    
+    <script>
+        // Système de capture des erreurs JavaScript
+        window.consoleLog = [];
+        (function() {
+            const oldLog = console.log;
+            const oldError = console.error;
+            const oldWarn = console.warn;
+            
+            console.log = function() {
+                window.consoleLog.push({type: 'log', msg: Array.from(arguments).join(' ')});
+                oldLog.apply(console, arguments);
+            };
+            console.error = function() {
+                window.consoleLog.push({type: 'error', msg: Array.from(arguments).join(' ')});
+                oldError.apply(console, arguments);
+                showError(Array.from(arguments).join(' '));
+            };
+            console.warn = function() {
+                window.consoleLog.push({type: 'warn', msg: Array.from(arguments).join(' ')});
+                oldWarn.apply(console, arguments);
+            };
+            
+            window.onerror = function(msg, url, lineNo, columnNo, error) {
+                const errorMsg = 'Erreur: ' + msg + ' à la ligne ' + lineNo + ':' + columnNo;
+                window.consoleLog.push({type: 'error', msg: errorMsg});
+                showError(errorMsg + '\n' + (error ? error.stack : ''));
+                return false;
+            };
+            
+            window.addEventListener('unhandledrejection', function(e) {
+                const errorMsg = 'Promise rejetée: ' + e.reason;
+                window.consoleLog.push({type: 'error', msg: errorMsg});
+                showError(errorMsg);
+            });
+            
+            function showError(msg) {
+                const app = document.getElementById('app');
+                if (app && app.innerHTML.includes('Chargement...')) {
+                    let html = '<div style="padding:20px;color:#fff;background:#1a1a1a;font-family:monospace;font-size:12px;">';
+                    html += '<h2 style="color:#ef4444;margin-bottom:15px;">🐛 Erreur JavaScript détectée</h2>';
+                    html += '<div style="background:#000;padding:15px;border-radius:8px;border:2px solid #ef4444;margin-bottom:15px;white-space:pre-wrap;word-break:break-all;">' + msg + '</div>';
+                    html += '<h3 style="color:#f59e0b;margin:15px 0 10px;">Console complète:</h3>';
+                    html += '<div style="background:#000;padding:15px;border-radius:8px;max-height:400px;overflow-y:auto;">';
+                    window.consoleLog.forEach(log => {
+                        const color = log.type === 'error' ? '#ef4444' : log.type === 'warn' ? '#f59e0b' : '#10b981';
+                        html += '<div style="color:' + color + ';margin-bottom:5px;">[' + log.type.toUpperCase() + '] ' + log.msg + '</div>';
+                    });
+                    html += '</div>';
+                    html += '<button onclick="location.reload()" style="margin-top:20px;padding:10px 20px;background:#3b82f6;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px;font-weight:bold;">Recharger la page</button>';
+                    html += '</div>';
+                    app.innerHTML = html;
+                }
+            }
+        })();
+    </script>
     <script src="script.js"></script>
 </body>
 </html>
