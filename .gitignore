@@ -8,6 +8,7 @@ config_local.php
 # Logs
 *.log
 logs/
+#outils/routine-quotidienne/js-errors.log
 
 # Fichiers système
 .DS_Store

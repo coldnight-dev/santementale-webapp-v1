@@ -1,0 +1,4 @@
+/* Styles spécifiques à la vue Today - Minimes car styles globaux gèrent l'apparence */
+#todayView {
+    /* Conteneur vide - les styles sont dans global.css */
+}

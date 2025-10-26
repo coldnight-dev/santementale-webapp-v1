@@ -1,0 +1,263 @@
+# Routine Quotidienne - Changelog v0.12-alpha
+
+**Date de publication :** Octobre 2025  
+**Type :** Refactorisation architecturale majeure
+
+---
+
+## 🏗️ Architecture Modulaire
+
+### Restructuration complète du code
+- **Séparation des vues** : Chaque vue (Aujourd'hui, Tâches, Stats, Paramètres) est maintenant isolée dans son propre répertoire sous `/view/`
+- **Chargement dynamique** : Les modules sont chargés à la demande via AJAX, réduisant le temps de chargement initial
+- **Encapsulation** : Chaque module gère ses propres dépendances JavaScript et CSS de manière autonome
+- **Cache intelligent** : Les vues chargées sont mises en cache pour améliorer la navigation
+
+### Structure des fichiers
+```
+/outils/routine-quotidienne/
+├── index.php (Layout principal + système de navigation)
+├── view/
+│   ├── today/
+│   │   └── index.php (Vue Aujourd'hui)
+│   ├── tasks/
+│   │   └── index.php (Vue Tâches)
+│   ├── stats/
+│   │   └── index.php (Vue Statistiques)
+│   └── settings/
+│       └── index.php (Vue Paramètres)
+```
+
+---
+
+## ⚡ Améliorations Techniques
+
+### Performance
+- **Réduction du poids initial** : Seul le layout principal et la vue par défaut sont chargés au démarrage
+- **Chargement progressif** : Les autres modules ne sont chargés que lorsque l'utilisateur y accède
+- **Optimisation du DOM** : Meilleure gestion du rendu et des événements JavaScript
+
+### Code Quality
+- **Modularité** : Code organisé en modules autonomes et réutilisables
+- **Maintenabilité** : Séparation claire des responsabilités (layout global vs logique métier)
+- **Évolutivité** : Ajout facilité de nouvelles fonctionnalités sans affecter l'existant
+- **Standards** : Respect des conventions ES6+ et des bonnes pratiques PHP
+
+### Sécurité
+- **Protection AJAX** : Les vues ne peuvent être accédées que via requêtes AJAX légitimes
+- **Validation** : Vérification systématique des en-têtes `X-Requested-With`
+- **Échappement HTML** : Protection contre les injections XSS dans tous les modules
+
+---
+
+## 🎨 Interface Utilisateur
+
+### Navigation
+- **Indicateur de chargement** : Loader animé pendant le chargement des vues
+- **Transitions fluides** : Animations améliorées entre les onglets
+- **État actif visuel** : Indication claire de la vue active dans la navigation
+
+### Accessibilité
+- **ARIA labels** : Attributs d'accessibilité sur tous les éléments interactifs
+- **Navigation clavier** : Support complet de la navigation au clavier
+- **Contraste** : Respect des ratios de contraste WCAG 2.1 AA
+- **Responsive** : Adaptation optimale sur tous les types d'écrans
+
+### Design
+- **Cohérence** : Design uniforme maintenu à travers tous les modules
+- **Modernité** : Utilisation de gradients, ombres et animations subtiles
+- **Feedback visuel** : Retours immédiats sur toutes les actions utilisateur
+
+---
+
+## 📊 Fonctionnalités par Vue
+
+### Vue "Aujourd'hui"
+- Affichage des tâches du jour
+- Système de coches pour marquer les tâches complétées
+- Barre de progression en temps réel
+- État vide avec message d'invitation
+
+### Vue "Tâches"
+- Création, modification et suppression de tâches
+- Catégorisation (Matin, Après-midi, Soir, N'importe quand)
+- Ajout d'horaires et de notes
+- Interface modale élégante pour l'édition
+
+### Vue "Statistiques"
+- Série actuelle et meilleure série
+- Taux de réussite global
+- Calendrier des 30 derniers jours
+- Graphique de progression hebdomadaire
+- Visualisation personnalisée en Canvas
+
+### Vue "Paramètres"
+- Toggle de notifications
+- Export/Import des données au format JSON
+- Informations sur le stockage
+- Suppression complète des données
+- Section "À propos"
+
+---
+
+## 🔒 Confidentialité & Données
+
+### Stockage Local
+- **100% local** : Toutes les données restent sur l'appareil de l'utilisateur
+- **Aucun tracking** : Pas de collecte de données personnelles
+- **Aucun serveur externe** : Pas de communication avec des API tierces
+- **Contrôle total** : L'utilisateur peut exporter et supprimer ses données à tout moment
+
+### Format d'Export
+- **JSON structuré** : Format standard et lisible
+- **Complet** : Inclut tâches, paramètres et historique
+- **Versionné** : Indication de la version pour compatibilité future
+- **Horodaté** : Date d'export pour traçabilité
+
+---
+
+## 🐛 Corrections & Optimisations
+
+### Bugs corrigés
+- Amélioration de la gestion des événements pour éviter les fuites mémoire
+- Correction du calcul des séries dans les statistiques
+- Meilleure gestion des dates et fuseaux horaires
+- Correction de l'affichage des pourcentages dans le graphique
+- Échappement HTML systématique pour prévenir les vulnérabilités XSS
+
+### Optimisations
+- Réduction du nombre de lectures/écritures dans localStorage
+- Mise en cache des vues chargées pour navigation instantanée
+- Optimisation du rendu des listes de tâches
+- Réduction de la duplication de code entre modules
+- Amélioration de la gestion des erreurs avec fallbacks appropriés
+
+---
+
+## 📱 Compatibilité
+
+### Navigateurs supportés
+- Chrome/Edge 90+
+- Firefox 88+
+- Safari 14+
+- Opera 76+
+
+### Plateformes
+- Desktop (Windows, macOS, Linux)
+- Mobile (iOS, Android)
+- Tablette
+
+### Technologies
+- PHP 7.4+
+- JavaScript ES6+
+- CSS3 avec Grid et Flexbox
+- localStorage API
+- Canvas API pour les graphiques
+
+---
+
+## 🚀 Migration depuis les versions précédentes
+
+### Compatibilité des données
+- **Rétrocompatible** : Les données des versions précédentes sont automatiquement reconnues
+- **Pas de migration requise** : Le format localStorage reste identique
+- **Préservation complète** : Toutes les tâches et statistiques sont conservées
+
+### Changements pour les développeurs
+- Nouvelle structure de fichiers modulaire
+- Système de chargement AJAX pour les vues
+- Séparation claire entre layout et modules
+- Documentation inline améliorée
+
+---
+
+## 📝 Notes techniques
+
+### Système de chargement
+```javascript
+// Chargement dynamique via AJAX
+fetch(`view/${viewName}/index.php`, {
+    method: 'GET',
+    headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+    }
+})
+```
+
+### Protection des vues
+```php
+// Chaque vue vérifie qu'elle est appelée via AJAX
+if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || 
+    $_SERVER['HTTP_X_REQUESTED_WITH'] !== 'XMLHttpRequest') {
+    header('Location: ../../index.php');
+    exit;
+}
+```
+
+### Encapsulation JavaScript
+```javascript
+// IIFE pour éviter la pollution du scope global
+(function() {
+    'use strict';
+    const ModuleView = {
+        // Code encapsulé
+    };
+    ModuleView.init();
+})();
+```
+
+---
+
+## 🎯 Objectifs atteints
+
+✅ Architecture modulaire complète  
+✅ Chargement dynamique des vues  
+✅ Séparation des responsabilités  
+✅ Performance optimisée  
+✅ Code maintenable et évolutif  
+✅ Accessibilité améliorée  
+✅ Compatibilité navigateurs modernes  
+✅ Préservation de toutes les fonctionnalités existantes  
+✅ Design cohérent et moderne  
+✅ Sécurité renforcée  
+
+---
+
+## 🔮 Perspectives futures
+
+### Améliorations prévues
+- Système de thèmes (clair/sombre)
+- Rappels et notifications programmables
+- Export PDF des statistiques
+- Synchronisation optionnelle via API
+- Application mobile native
+- Support multilingue
+- Templates de routines pré-configurées
+- Partage de routines entre utilisateurs
+
+### Feedback utilisateur
+Vos retours sont précieux ! N'hésitez pas à partager vos suggestions sur le groupe Facebook SanteMentale.org ou via le site web.
+
+---
+
+## 📞 Support
+
+**Site web :** https://santementale.org  
+**Application :** https://app.santementale.org  
+**Groupe Facebook :** SanteMentale.org  
+
+---
+
+## 👥 Crédits
+
+**Développement :** Équipe SanteMentale.org  
+**Architecture :** L'Architecte Web Ultime  
+**Version :** 0.12-alpha  
+**License :** Propriétaire - SanteMentale.org  
+
+---
+
+*Ce changelog documente la refactorisation architecturale majeure de la version 0.12-alpha. Toutes les fonctionnalités existantes ont été préservées tout en améliorant significativement la structure du code, les performances et la maintenabilité.*
+
+
+
