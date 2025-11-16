@@ -492,7 +492,7 @@ gratitude</h2>
                 <h2><i class="fas fa-layer-group tool-icon"></i> Pyramide des besoins</h2>
                 <p>Évaluez vos besoins fondamentaux pour prioriser votre bien-être.</p>
             </a>
-            <a href="/v1/outils/balance-decisionnelle.php" class="tool-item" id="balanceTool">
+            <a href="/v1/outils/balance-decisionnelle/" class="tool-item" id="balanceTool">
                 <h2><i class="fas fa-scale-balanced tool-icon"></i> Balance décisionnelle</h2>
                 <p>Pesez le pour et le contre pour prendre des décisions éclairées.</p>
             </a>
@@ -542,7 +542,7 @@ gratitude</h2>
             document.getElementById('emotionTool').href = `/v1/outils/journal-des-emotions.php${versionParam}`;
             document.getElementById('gratitudeTool').href = `/v1/outils/journal-de-gratitude.php${versionParam}`;
             document.getElementById('pyramideTool').href = `/v1/outils/pyramide-des-besoins.php${versionParam}`;
-            document.getElementById('balanceTool').href = `/v1/outils/balance-decisionnelle.php${versionParam}`;
+            document.getElementById('balanceTool').href = `/v1/outils/balance-decisionnelle/${versionParam}`;
             function updateTime() {
                 const now = new Date();
                 const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
