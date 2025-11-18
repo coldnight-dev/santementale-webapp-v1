@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SanteMentale.org - Bientôt disponible</title>
     <link rel="icon" type="image/x-icon" href="https://santementale.org/favicon.ico">
     <!-- Manifest PWA (désactivé pour éviter le popup installation) -->
@@ -161,8 +161,8 @@
             border-radius: 5px;
             font-size: 16px;
         }
-        /* Gestion du mode paysage */
-        @media (orientation: landscape) {
+        /* Gestion du mode paysage mobile uniquement */
+        @media (max-width: 767px) and (orientation: landscape) {
             body {
                 transform: rotate(90deg);
                 transform-origin: left top;
@@ -181,6 +181,22 @@
         @media (max-width: 480px) {
             .container {
                 padding: 10px;
+            }
+        }
+        /* Compatibilité desktop */
+        @media (min-width: 768px) {
+            body {
+                transform: none !important;
+                width: 100% !important;
+                height: auto !important;
+                position: static !important;
+                top: auto !important;
+                left: auto !important;
+            }
+            .container {
+                max-width: 900px;
+                margin: 0 auto;
+                padding: 40px 20px;
             }
         }
     </style>

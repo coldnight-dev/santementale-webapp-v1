@@ -9,7 +9,7 @@ require_once(__DIR__ . '/components/save-handler.php');
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SanteMentale.org - Appli bien-être</title>
     <link rel="icon" type="image/x-icon" href="https://santementale.org/favicon.ico">
     <link rel="manifest" href="/v1/manifest.json">
@@ -474,7 +474,7 @@ opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             from { right: -200px; }
             to { right: 10px; }
         }
-        @media (orientation: landscape) {
+        @media (max-width: 767px) and (orientation: landscape) {
             body {
                 transform: rotate(90deg);
                 transform-origin: left top;
@@ -502,6 +502,23 @@ opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             .help-btn {
                 top: 110px;
                 right: 10px;
+            }
+        }
+        @media (min-width: 768px) {
+            body {
+                transform: none !important;
+                width: 100% !important;
+                height: auto !important;
+                position: static !important;
+                top: auto !important;
+                left: auto !important;
+            }
+            .container {
+                max-width: 900px;
+                margin: 0 auto;
+            }
+            #incompatible {
+                display: none !important;
             }
         }
     </style>
@@ -630,7 +647,8 @@ opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             const isAndroid = /Android/i.test(navigator.userAgent);
             const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
             const isMobile = isAndroid || isIOS;
-            if (!isMobile) {
+            const screenWidth = window.innerWidth;
+            if (!isMobile && screenWidth < 768) {
                 document.getElementById('incompatible').style.display = 'flex';
                 return;
             }
