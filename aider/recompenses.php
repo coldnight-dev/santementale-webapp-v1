@@ -398,9 +398,9 @@ opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                     <span style="flex: 1; text-align: center;">Regarder une vidéo (Torox)</span>
                 </button>
             </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 24px;">
-                <div class="tickets-info" style="margin: 0;">
-                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-top: 24px;">
+                <div class="tickets-info">
+                    <div style="display: flex; align-items: center; gap: 12px;">
                         <span class="material-icons" style="color: #9b59b6; font-size: 28px;">confirmation_number</span>
                         <div style="text-align: left; flex: 1;">
                             <div class="tickets-count" id="todayTickets">0</div>
@@ -408,8 +408,8 @@ opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                         </div>
                     </div>
                 </div>
-                <div class="tickets-info" style="margin: 0;">
-                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                <div class="tickets-info">
+                    <div style="display: flex; align-items: center; gap: 12px;">
                         <span class="material-icons" style="color: #9b59b6; font-size: 28px;">calendar_today</span>
                         <div style="text-align: left; flex: 1;">
                             <div class="tickets-count" id="weekTickets">0</div>
@@ -417,13 +417,13 @@ opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="tickets-info" style="margin-top: 12px;">
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                    <span class="material-icons" style="color: #9b59b6; font-size: 28px;">workspace_premium</span>
-                    <div style="text-align: left; flex: 1;">
-                        <div class="tickets-count" id="totalTickets">0</div>
-                        <div class="tickets-label" style="margin: 0;">au total</div>
+                <div class="tickets-info">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span class="material-icons" style="color: #9b59b6; font-size: 28px;">workspace_premium</span>
+                        <div style="text-align: left; flex: 1;">
+                            <div class="tickets-count" id="totalTickets">0</div>
+                            <div class="tickets-label" style="margin: 0;">au total</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -431,12 +431,21 @@ opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 Merci de soutenir cette application gratuitement ! 💜
             </p>
         </div>
+        <div class="content-box" style="background: rgba(155, 89, 182, 0.1); border: 2px solid rgba(155, 89, 182, 0.3);">
+            <span class="material-icons" style="font-size: 36px; color: #9b59b6; margin-bottom: 12px;">info</span>
+            <p style="margin-bottom: 0;">
+                <strong>Pourquoi regarder des vidéos ?</strong>
+            </p>
+            <p style="font-size: clamp(14px, 3.5vw, 16px);">
+                En visionnant ces vidéos, vous nous aidez à maintenir cette application <strong>gratuite et sans publicité</strong>. En remerciement, vous gagnez des <span class="highlight">tickets de participation</span> pour nos concours réguliers avec des <strong>cadeaux à gagner</strong> ! 🎁
+            </p>
+        </div>
         <button class="back-btn" onclick="window.history.back();">
             <span class="material-icons">arrow_back</span>
             Retour
         </button>
         <p class="footer" style="margin-top: 3em; color: var(--footer-color); line-height: 1.8; font-size: 14px;">
-            <span id="appVersionFooter">X-0.251116</span><br>
+            <span id="appVersionFooter">X-0.251117</span><br>
             <a class="about-link" onclick="document.getElementById('aboutPopup').classList.add('show');">À propos</a> •
             <a class="about-link" onclick="document.getElementById('privacyPopup').classList.add('show');">Confidentialité</a><br>
             <span style="color: #161616;">©2025 SanteMentale.org</span>
