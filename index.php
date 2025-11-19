@@ -2,14 +2,14 @@
 // Validation centralisée de la version
 require_once(__DIR__ . '/config.php');
 require_once(__DIR__ . '/version_check.php');
-// ✅ HANDLER PHP UNIQUEMENT
+// ✅  HANDLER PHP UNIQUEMENT
 require_once(__DIR__ . '/components/save-handler.php');
 ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SanteMentale.org - Appli bien-être</title>
     <link rel="icon" type="image/x-icon" href="https://santementale.org/favicon.ico">
     <link rel="manifest" href="/v1/manifest.json">
@@ -18,8 +18,7 @@ require_once(__DIR__ . '/components/save-handler.php');
     <meta property="og:image" content="https://santementale.org/logo.png">
     <meta property="og:url" content="https://app.santementale.org/v1/?v=1.web">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="SanteMentale.org — Web Appli">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta property="og:title" content="SanteMentale.org — Web Appli">    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="https://santementale.org/logo.png">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
@@ -37,8 +36,7 @@ require_once(__DIR__ . '/components/save-handler.php');
             --accent-primary: #0d47a1;
             --accent-secondary: #42a5f5;
             --gradient-blue: linear-gradient(135deg, #42a5f5, #0d47a1);
-            --gradient-red: linear-gradient(90deg, #e63946, #d00000);
-            --border-radius: 12px;
+            --gradient-red: linear-gradient(90deg, #e63946, #d00000);            --border-radius: 12px;
             --shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
             --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.2);
             --popup-bg: #ffffff;
@@ -106,12 +104,14 @@ require_once(__DIR__ . '/components/save-handler.php');
             align-items: center;
             gap: 8px;
             transform: translateY(-100%);
-            animation: slideInDown 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.2s forwards;
+            animation: slideInDown 0.6s cubic-bezier(0.4, 0, 0.2, 1)
+0.2s forwards;
         }
         .new-device-message {
             color: #f1c40f;
             font-size: clamp(20px, 6vw, 28px);
-            animation: slideInDown 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.2s forwards;
+            animation: slideInDown 0.6s cubic-bezier(0.4, 0, 0.2, 1)
+0.2s forwards;
         }
         p.description {
             font-size: clamp(14px, 4vw, 16px);
@@ -137,7 +137,8 @@ require_once(__DIR__ . '/components/save-handler.php');
         }
         .footer {
             opacity: 0;
-            animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) 2.0s forwards;
+            animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) 2.0s
+forwards;
         }
         @keyframes slideInDown {
             from { transform: translateY(-100%); }
@@ -216,7 +217,8 @@ require_once(__DIR__ . '/components/save-handler.php');
             align-items: center;
             justify-content: center;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            animation: slideInDown 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation: slideInDown 0.5s cubic-bezier(0.4, 0, 0.2, 1)
+forwards;
         }
         .banner:hover {
             transform: translateY(2px);
@@ -260,7 +262,8 @@ require_once(__DIR__ . '/components/save-handler.php');
             box-shadow: var(--shadow);
             transform: scale(0.9);
             opacity: 0;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .popup.show .popup-content {
             transform: scale(1);
@@ -393,11 +396,11 @@ require_once(__DIR__ . '/components/save-handler.php');
             color: var(--accent-secondary);
             text-decoration: underline;
         }
-        /* ✅ BOUTON PARTAGER EXACTEMENT COMME AVANT */
+        /* ✅  BOUTON PARTAGER EXACTEMENT COMME AVANT */
         .share-btn {
             position: fixed;
-            top: 60px; /* Sous la bannière (hauteur ~40px + marge) */
-            right: -200px; /* Hors écran initialement */
+            top: 60px;
+            right: -200px;
             background: var(--gradient-blue);
             color: var(--text-primary);
             border: none;
@@ -406,23 +409,23 @@ require_once(__DIR__ . '/components/save-handler.php');
             font-size: clamp(12px, 3vw, 14px);
             font-weight: 600;
             cursor: pointer;
-            z-index: 999; /* Sous la bannière (z-index: 1000) */
+            z-index: 999;
             box-shadow: var(--shadow-light);
             display: flex;
             align-items: center;
             transition: right 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .share-btn.visible {
-            right: 10px; /* Position visible */
+            right: 10px;
             animation: slideInRight 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
         .share-btn.collapsed {
-            right: -80px; /* Ne montre que l'icône + marge */
+            right: -80px;
             padding: 8px;
-            width: 40px; /* Taille compacte pour icône */
+            width: 40px;
         }
         .share-btn:hover {
-            right: 10px !important; /* Réaffiche au hover */
+            right: 10px !important;
             padding: 8px 16px;
             width: auto;
             box-shadow: 0 10px 28px rgba(13, 71, 161, 0.5);
@@ -433,13 +436,45 @@ require_once(__DIR__ . '/components/save-handler.php');
             margin-right: 6px;
         }
         .share-btn.collapsed .share-text {
-            display: none; /* Cache le texte en mode collapsé */
+            display: none;
+        }
+        /* ✅  BOUTON AIDER */
+        .help-btn {
+            position: fixed;
+            top: 110px;
+            right: 10px;
+            background: linear-gradient(135deg, #ffb3ba, #ff6b7a);
+            color: var(--text-primary);
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 8px;
+            width: 40px;
+            font-size: clamp(12px, 3vw, 14px);
+            font-weight: 600;
+            cursor: pointer;
+            z-index: 999;
+            box-shadow: var(--shadow-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+        }
+        .help-btn.visible {
+            opacity: 1;
+        }
+        .help-btn:hover {
+            box-shadow: 0 10px 28px rgba(255, 107, 122, 0.5);
+            transform: scale(1.05);
+        }
+        .help-btn .material-icons {
+            font-size: 18px;
         }
         @keyframes slideInRight {
             from { right: -200px; }
             to { right: 10px; }
         }
-        @media (orientation: landscape) {
+        @media (max-width: 767px) and (orientation: landscape) {
             body {
                 transform: rotate(90deg);
                 transform-origin: left top;
@@ -464,19 +499,42 @@ require_once(__DIR__ . '/components/save-handler.php');
             .share-btn:hover {
                 right: 10px !important;
             }
+            .help-btn {
+                top: 110px;
+                right: 10px;
+            }
+        }
+        @media (min-width: 768px) {
+            body {
+                transform: none !important;
+                width: 100% !important;
+                height: auto !important;
+                position: static !important;
+                top: auto !important;
+                left: auto !important;
+            }
+            .container {
+                max-width: 900px;
+                margin: 0 auto;
+            }
+            #incompatible {
+                display: none !important;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- ✅ CLOUD INTÉGRÉ (z-index 1001 = AU-DESSUS de tout) -->
+    <!-- ✅  CLOUD INTÉGRÉ (z-index 1001 = AU-DESSUS de tout) -->
     <?php require_once(__DIR__ . '/components/save-cloud.php'); ?>
-    
     <!-- Bouton partager EXACTEMENT COMME AVANT -->
     <button class="share-btn" id="shareBtn">
         <span class="material-icons">share</span>
         <span class="share-text">Partager</span>
     </button>
-    
+    <!-- ✅  BOUTON AIDER -->
+    <a href="aider/" class="help-btn" id="helpBtn">
+        <span class="material-icons">volunteer_activism</span>
+    </a>
     <div id="installBanner" class="banner">
         <span id="bannerIcon" class="material-icons banner-icon">install_mobile</span>
         Installer le raccourci pour accéder aux fonctionnalités avancées
@@ -525,7 +583,8 @@ require_once(__DIR__ . '/components/save-handler.php');
             <a href="#" id="settingsBtn" class="cta settings-btn"><span class="material-icons">settings_applications</span><span class="text">Paramètres</span></a>
         </div>
         <p class="footer" style="margin-top: 3em; color: var(--footer-color); line-height: 1.8; font-size: 14px;">
-            <span id="appVersionFooter"></span> • Accès anticipé<br>
+            <strong style="color: #d00000;">Accès anticipé</strong><br>
+            <span id="appVersionFooter"></span><br>
             <a class="about-link" onclick="document.getElementById('aboutPopup').classList.add('show');">À propos</a> •
             <a class="about-link" onclick="document.getElementById('privacyPopup').classList.add('show');">Confidentialité</a><br>
             <span style="color: #161616;">©2025 SanteMentale.org</span>
@@ -588,7 +647,8 @@ require_once(__DIR__ . '/components/save-handler.php');
             const isAndroid = /Android/i.test(navigator.userAgent);
             const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
             const isMobile = isAndroid || isIOS;
-            if (!isMobile) {
+            const screenWidth = window.innerWidth;
+            if (!isMobile && screenWidth < 768) {
                 document.getElementById('incompatible').style.display = 'flex';
                 return;
             }
@@ -602,7 +662,7 @@ require_once(__DIR__ . '/components/save-handler.php');
             const versionInfo = VersionHelper.getVersionInfo();
             document.getElementById('apiVersion').textContent = `API: ${versionInfo.api}`;
             document.getElementById('appVersion').textContent = `App: ${clientVersion}`;
-            document.getElementById('appVersionFooter').textContent = `App v${clientVersion} • Mod v${versionInfo.module}`;
+            document.getElementById('appVersionFooter').textContent = `${clientVersion}-0.251115`;
             let deviceUUID = localStorage.getItem(uuidKey);
             let username = localStorage.getItem(usernameKey);
             const isNewDevice = !deviceUUID;
@@ -632,8 +692,7 @@ require_once(__DIR__ . '/components/save-handler.php');
             });
             const isInstalled = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
             const installBanner = document.getElementById('installBanner');
-            const bannerIcon = document.getElementById('bannerIcon');
-            const installPopup = document.getElementById('installPopup');
+            const bannerIcon = document.getElementById('bannerIcon');            const installPopup = document.getElementById('installPopup');
             const installArea = document.getElementById('installArea');
             const testsBtn = document.getElementById('testsBtn');
             function showInstallPopup() {
@@ -647,16 +706,14 @@ require_once(__DIR__ . '/components/save-handler.php');
                         deferredPrompt.prompt();
                         deferredPrompt.userChoice.then((choice) => {
                             if (choice.outcome === 'accepted') {
-                                installBanner.style.display = 'none';
-                                testsBtn.classList.remove('disabled');
+                                installBanner.style.display = 'none';                                testsBtn.classList.remove('disabled');
                             }
                             deferredPrompt = null;
                         });
                     };
                     installArea.appendChild(installBtn);
                 } else if (isIOS) {
-                    const instructions = document.createElement('p');
-                    instructions.innerHTML = "Pour installer : Appuyez sur l'icône de partage en bas de l'écran, puis sélectionnez <strong>'Ajouter à l'écran d'accueil'</strong>.";
+                    const instructions = document.createElement('p');                    instructions.innerHTML = "Pour installer : Appuyez sur l'icône de partage en bas de l'écran, puis sélectionnez <strong>'Ajouter à l'écran d'accueil'</strong>.";
                     installArea.appendChild(instructions);
                 } else {
                     const errorMsg = document.createElement('p');
@@ -687,14 +744,15 @@ require_once(__DIR__ . '/components/save-handler.php');
             }
             window.saveUsername = function() {
                 const input = document.getElementById('usernameInput');
-                const newUsername = input.value.trim() || 'visiteur';
-                localStorage.setItem(usernameKey, newUsername);
+                const newUsername = input.value.trim() || 'visiteur';                localStorage.setItem(usernameKey, newUsername);
                 document.getElementById('welcomeMessage').innerHTML = `Bonjour, <span class="username" onclick="document.getElementById('usernamePopup').classList.add('show');">${newUsername}</span><span class="material-icons pencil-icon" style="font-size: 16px; color: var(--pencil-fill);">edit</span>`;
                 document.getElementById('usernamePopup').classList.remove('show');
             };
             const shareBtn = document.getElementById('shareBtn');
+            const helpBtn = document.getElementById('helpBtn');
             setTimeout(() => {
                 shareBtn.classList.add('visible');
+                helpBtn.classList.add('visible');
                 setTimeout(() => {
                     shareBtn.classList.add('collapsed');
                 }, 7000);

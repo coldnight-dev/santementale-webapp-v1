@@ -8,7 +8,7 @@ require_once(__DIR__ . '/../version_check.php');
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SanteMentale.org - Outils interactifs</title>
     <link rel="icon" type="image/x-icon" href="https://santementale.org/favicon.ico">
     <link rel="apple-touch-icon" href="https://santementale.org/logo.png">
@@ -416,7 +416,7 @@ require_once(__DIR__ . '/../version_check.php');
             0%, 100% { opacity: 1; }
             50% { opacity: 0; }
         }
-        @media (orientation: landscape) {
+        @media (max-width: 767px) and (orientation: landscape) {
             body {
                 transform: rotate(90deg);
                 transform-origin: left top;
@@ -427,6 +427,21 @@ require_once(__DIR__ . '/../version_check.php');
                 top: 100%;
                 left: 0;
                 transition: transform 0.375s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+        }
+        @media (min-width: 768px) {
+            body {
+                transform: none !important;
+                width: 100% !important;
+                height: auto !important;
+                position: static !important;
+                top: auto !important;
+                left: auto !important;
+            }
+            .container {
+                max-width: 900px;
+                margin: 0 auto;
+                padding: 40px 20px;
             }
         }
     </style>
@@ -492,7 +507,7 @@ gratitude</h2>
                 <h2><i class="fas fa-layer-group tool-icon"></i> Pyramide des besoins</h2>
                 <p>Évaluez vos besoins fondamentaux pour prioriser votre bien-être.</p>
             </a>
-            <a href="/v1/outils/balance-decisionnelle.php" class="tool-item" id="balanceTool">
+            <a href="/v1/outils/balance-decisionnelle/" class="tool-item" id="balanceTool">
                 <h2><i class="fas fa-scale-balanced tool-icon"></i> Balance décisionnelle</h2>
                 <p>Pesez le pour et le contre pour prendre des décisions éclairées.</p>
             </a>
@@ -542,7 +557,7 @@ gratitude</h2>
             document.getElementById('emotionTool').href = `/v1/outils/journal-des-emotions.php${versionParam}`;
             document.getElementById('gratitudeTool').href = `/v1/outils/journal-de-gratitude.php${versionParam}`;
             document.getElementById('pyramideTool').href = `/v1/outils/pyramide-des-besoins.php${versionParam}`;
-            document.getElementById('balanceTool').href = `/v1/outils/balance-decisionnelle.php${versionParam}`;
+            document.getElementById('balanceTool').href = `/v1/outils/balance-decisionnelle/${versionParam}`;
             function updateTime() {
                 const now = new Date();
                 const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
